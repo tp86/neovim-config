@@ -1,0 +1,4 @@
+/plugged/
+/sessions/
+/pyenv/
+autoload/plug.vim
