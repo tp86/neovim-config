@@ -274,7 +274,7 @@ augroup terminal_settings
   autocmd TermLeave,BufLeave,WinLeave term://* stopinsert
 augroup end
 " actions running on terminal start {{{3
-" python virtualenv activation 
+" python virtualenv activation
 " uses $VIRTUAL_ENV variable that should be set by DEP: vim-virtualenv plugin
 augroup pyvenv_activation
   autocmd!
@@ -343,6 +343,46 @@ noremap H ^
 noremap L $
 " easier switching between alternate buffers
 nnoremap <backspace> <c-^>
+" formatting {{{2
+set expandtab
+set tabstop=4 softtabstop=4 shiftwidth=4 shiftround
+set smartindent
+" adding empty lines above/below current line
+function s:empty_lines(count, above)
+  let current_position = getcurpos()
+  let new_position = [current_position[1], current_position[4]]
+  let line_to_insert = new_position[0]
+  if a:above
+    let line_to_insert = new_position[0] - 1
+    let new_position[0] += a:count
+  endif
+  call append(line_to_insert, repeat([""], a:count))
+  call cursor(new_position)
+endfunction
+nnoremap <silent> [<space> :<c-u>call <sid>empty_lines(v:count1, v:true)<cr>
+nnoremap <silent> ]<space> :<c-u>call <sid>empty_lines(v:count1, v:false)<cr>
+" automatically replace tabs with spaces on saving
+" set this to false to turn off this behavior
+let g:autoretab = v:true
+augroup auto_retab
+  autocmd!
+  autocmd BufWrite * if g:autoretab | retab | endif
+augroup end
+" automatically remove trailing spaces
+" set this to false to turn off this behavior
+let g:autoremove_trail_spaces = v:true
+augroup auto_remove_trail_space
+  autocmd!
+  function! s:remove_trail_space()
+    let view = winsaveview()
+    try
+      %s/\v\s+$//
+    catch /E486:/
+    endtry
+    call winrestview(view)
+  endfunction
+  autocmd BufWrite * if g:autoremove_trail_spaces | call <sid>remove_trail_space() | endif
+augroup end
 " searching {{{2
 set ignorecase
 set smartcase
