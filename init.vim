@@ -69,10 +69,19 @@ let g:session_default_to_last = v:true
 Plug 'tpope/vim-fugitive'
 Plug 'mhinz/vim-signify'
 set updatetime=100
+let g:signify_sign_change = '~'
 " virtual environments {{{3
 Plug 'jmcantrell/vim-virtualenv'
 let g:virtualenv_stl_format = '(%n)'
 " fuzzy search {{{3
+Plug 'junegunn/fzf'
+let g:fzf_layout = {"window": "botright 12 split enew"}
+let g:fzf_action = {
+      \ "ctrl-t": "tab split",
+      \ "ctrl-s": "split",
+      \ "ctrl-v": "vsplit",
+      \}
+Plug 'junegunn/fzf.vim'
 " explorer {{{3
 " lsp {{{3
 " project {{{3
@@ -431,5 +440,38 @@ nnoremap <silent> [s :<c-u>call <sid>search_jump("backward")<cr>
 " git {{{2
 nnoremap <silent> cd <cmd>SignifyHunkDiff<cr>
 nnoremap <silent> cu <cmd>SignifyHunkUndo<crs:>
+" git & fuzzy search {{{2
+" searching and switching to git branches
+function! s:execute_git(git_dir, command)
+  let git_dir = a:git_dir
+  if fnamemodify(git_dir, ":t") =~# '\v\.git$'
+    let git_dir = fnamemodify(git_dir, ":h")
+  endif
+  if empty(git_dir)
+    return[]
+  endif
+  let git_command = printf("git --git-dir=%s --work-tree=%s %s",
+        \ expand(git_dir .. "/.git"),
+        \ git_dir,
+        \ a:command
+        \)
+  return map(systemlist(git_command), {_, l -> trim(l)})
+endfunction
+function! GitBranches()
+  let dict = {
+        \ "source": filter(
+        \             filter(s:execute_git(FugitiveGitDir(), "branch -a"),
+        \             {_, b -> !empty(b)}),
+        \           {_, b -> b !~# '\v^\s*remotes/.{-}/HEAD\s+-\>\s+'})
+        \}
+  function! dict.sink(lines)
+    if a:lines !~# '\v^\s*\*'
+      let branch = matchstr(a:lines, '\v^(\s*remotes/.{-}/)?\zs.*\ze$')
+      execute "Git checkout " .. branch
+    endif
+  endfunction
+  call fzf#run(fzf#wrap(dict))
+endfunction
+command! GitBranches call GitBranches()
 " }}}
 " vim:foldmethod=marker
