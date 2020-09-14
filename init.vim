@@ -72,6 +72,12 @@ set updatetime=100
 " virtual environments {{{3
 Plug 'jmcantrell/vim-virtualenv'
 let g:virtualenv_stl_format = '(%n)'
+" fuzzy search {{{3
+" explorer {{{3
+" lsp {{{3
+" project {{{3
+" snippets {{{3
+" misc {{{3
 call plug#end()
 " Settings {{{1
 " colorscheme {{{2
@@ -190,7 +196,6 @@ function! s:statusline_nc()
   let stl   = "%{pathshorten(fnamemodify(getcwd(), ':p')[:-2])} "
   let stl ..= "%{" .. expand("<SID>") .. "stl_filename()} %m%r"
   let stl ..= "%*"
-endfunction
   let stl ..= "%="
   return stl
 endfunction
@@ -200,6 +205,57 @@ augroup statusline
   autocmd WinEnter,BufWinEnter * let &l:statusline = "%!" .. expand("<SID>") .. "statusline()"
   autocmd WinLeave * let &l:statusline = "%!" .. expand("<SID>") .. "statusline_nc()"
 augroup end
+" tabline {{{3
+function! s:tabline()
+  let tbl = ""
+  function! s:tabpage_label(tabpagenr)
+    if a:tabpagenr == tabpagenr()
+      let label = "%#TablineSel#"
+    else
+      let label = "%#Tabline#"
+    endif
+    let label ..= "%" .. a:tabpagenr .. "T "
+    function! s:tabline_modified(tabpagenr)
+      for winnr in range(1, tabpagewinnr(a:tabpagenr, "$"))
+        if gettabwinvar(a:tabpagenr, winnr, "&modified")
+          return "+"
+        endif
+      endfor
+      return ""
+    endfunction
+    let label ..= "%{" .. expand("<SID>") .. "tabline_modified(" .. a:tabpagenr .. ")} "
+    function! s:tabline_filename(tabpagenr)
+      let winnr = tabpagewinnr(a:tabpagenr)
+      let bufnr = tabpagebuflist(a:tabpagenr)[winnr - 1]
+      let bufname = bufname(bufnr)
+      let filename = fnamemodify(bufname, ":t")
+      let full_bufname = fnamemodify(bufname, ":p")
+      " special cases
+      " terminal buffers
+      if full_bufname =~# '\v^term://'
+        let splitted_term_uri = split(full_bufname, ":")
+        let shell_pid = fnamemodify(splitted_term_uri[1], ":t")
+        let shell_exec = fnamemodify(splitted_term_uri[-1], ":t")
+        return join([splitted_term_uri[0], shell_pid, shell_exec], ":")
+      endif
+      if empty(filename)
+        return "[No Name]"
+      endif
+      " basic case
+      return filename
+    endfunction
+    let label ..= "%{" .. expand("<SID>") .. "tabline_filename(" .. a:tabpagenr .. ")} "
+    let label ..= a:tabpagenr .. "|"
+    return label
+  endfunction
+  for tabpagenr in range(1, tabpagenr("$"))
+    let tbl ..= s:tabpage_label(tabpagenr)
+  endfor
+  let tbl ..= "%#TablineFill#"
+  let tbl ..= "%="
+  return tbl
+endfunction
+let &tabline = "%!" .. expand("<SID>") .. "tabline()"
 " terminal {{{2
 " use Esc for leaving insert mode in terminal
 tnoremap <esc> <c-\><c-n>
