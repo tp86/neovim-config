@@ -3,24 +3,24 @@
 "   - python
 
 " temporary for development {{{1
-unlet! s:vim_home
-unlet! s:dir_sep
-unlet! s:vim_home_
 nnoremap <silent> <space>ws :w<cr>:so %<cr>
 
 " base Neovim directory {{{1
-const s:vim_home = expand(fnamemodify($MYVIMRC, ":p:h"))
+let s:vim_home = expand(fnamemodify($MYVIMRC, ":p:h"))
 if has("unix")
-  const s:dir_sep = '/'
+  let s:dir_sep = '/'
 elseif has("win32")
-  const s:dir_sep = '\'
+  let s:dir_sep = '\'
 endif
-const s:vim_home_ = s:vim_home .. s:dir_sep
+let s:vim_home_ = s:vim_home .. s:dir_sep
 
 " python providers {{{1
 if has("unix")
   let g:python3_host_prog = s:vim_home_ .. "pyenv/py3/bin/python"
 endif
+
+let mapleader = " "
+let maplocalleader = " "
 
 " Plugins {{{1
 " automatic installation of vim-plug {{{2
@@ -83,6 +83,14 @@ let g:fzf_action = {
       \}
 Plug 'junegunn/fzf.vim'
 " explorer {{{3
+Plug 'preservim/nerdtree'
+let g:NERDTreeWinSize = 40
+let g:NERDTreeMapOpenVSplit = 'v'
+let g:NERDTreeMapOpenSplit = 's'
+let g:NERDTreeQuitOnOpen = v:true
+nnoremap <leader>E <cmd>NERDTreeToggleVCS<cr>
+Plug 'Xuyuanp/nerdtree-git-plugin'
+let g:NERDTreeGitStatusConcealBrackets = v:true
 " lsp {{{3
 " project {{{3
 " snippets {{{3
@@ -137,73 +145,19 @@ function! s:statusline()
   let stl   = "%#stl_venv#%(%{VirtualEnvStatusline()} %)"
   let stl ..= "%#stl_cwd#%{pathshorten(fnamemodify(getcwd(), ':p')[:-2])}"
   let stl ..= "%#stl_git#%( (%{pathshorten(FugitiveHead(8))})%)%(%{sy#repo#get_stats_decorated()}%)"
-  function! s:stl_filename()
-    let bufname = bufname()
-    let filename = fnamemodify(bufname, ":t")
-    " special cases
-    " filetype-based
-    if index(["help"], &filetype) >= 0
-      return filename
-    endif
-    const full_bufname = fnamemodify(bufname, ":p")
-    " git-diff buffers
-    const git_type_to_name = {
-          \ "0": "index",
-          \ "2": "current",
-          \ "3": "incoming",
-          \}
-    if full_bufname =~# '\v^fugitive:' .. escape(expand("/"), '\') .. '{2,}'
-      let git_buf_type = matchstr(full_bufname, '\v' .. escape('.git' .. expand("/"), '.\') .. '{2}\zs\x+\ze')
-      if !empty(git_buf_type)
-        let git_type_name = get(git_type_to_name, git_buf_type, "(" .. git_buf_type[:7] .. ")")
-        return filename .. " @ " .. git_type_name
-      endif
-    endif
-    " terminal buffers
-    if full_bufname =~# '\v^term://'
-      let splitted_term_uri = split(full_bufname, ":")
-      let shell_pid = fnamemodify(splitted_term_uri[1], ":t")
-      let shell_exec = fnamemodify(splitted_term_uri[-1], ":t")
-      return join(splitted_term_uri[0], shell_pid, shell_exec], ":")
-    endif
-    " buffer without file
-    if empty(filename)
-      return "[No Name]"
-    endif
-    " basic case
-    function! s:relative_path(path, base_path)
-      let full_base_path = escape(fnamemodify(a:base_path, ":p"), '\')
-      let relative_path = matchstr(a:path, '\v' .. full_base_path .. '\zs.*$')
-      if empty(relative_path)
-        return a:path
-      else
-        return relative_path
-      endif
-    endfunction
-    let relative_dir = fnamemodify(s:relative_path(full_bufname, getcwd()), ":h")
-    if relative_dir ==# "."
-      return filename
-    else
-      return expand(join([pathshorten(relative_dir), filename], "/"))
-    endif
-  endfunction
-  let stl ..= "%#stl_filename# %{" .. expand("<SID>") .. "stl_filename()} %m%r"
+  let stl ..= "%#stl_filename# %{stl#filename()} %m%r"
   let stl ..= "%*"
   let stl ..= "%="
   let stl ..= "%($[%{xolox#session#find_current_session()}] %)"
-  function! s:stl_lsp()
-    " TODO
-    return 2
-  endfunction
-  let stl ..= "%(%#stl_lsp_ok#%{" .. expand("<SID>") .. "stl_lsp()==0?'o':''}" ..
-        \      "%#stl_lsp_err#%{" .. expand("<SID>") .. "stl_lsp()==1?'x':''}" ..
+  let stl ..= "%(%#stl_lsp_ok#%{stl#lsp()==0?'o':''}" ..
+        \      "%#stl_lsp_err#%{stl#lsp()==1?'x':''}" ..
         \      "%* %)"
   let stl ..= "\u2261%p%%"
   return stl
 endfunction
 function! s:statusline_nc()
   let stl   = "%{pathshorten(fnamemodify(getcwd(), ':p')[:-2])} "
-  let stl ..= "%{" .. expand("<SID>") .. "stl_filename()} %m%r"
+  let stl ..= "%{stl#filename()} %m%r"
   let stl ..= "%*"
   let stl ..= "%="
   return stl
