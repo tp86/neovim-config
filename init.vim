@@ -17,6 +17,8 @@ let s:vim_home_ = s:vim_home .. s:dir_sep
 " python providers {{{1
 if has("unix")
   let g:python3_host_prog = s:vim_home_ .. "pyenv/py3/bin/python"
+elseif has("win32")
+  let g:python3_host_prog = s:vim_home_ .. "pyenv\\py3\\Scripts\\python.exe"
 endif
 
 let mapleader = " "
@@ -27,18 +29,25 @@ let maplocalleader = " "
 " taken from https://github.com/junegunn/vim-plug/wiki/tips#automatic-installation
 " requires DEP: curl
 let s:plug_file = s:vim_home_ .. expand("autoload/plug.vim")
-if empty(glob(s:plug_file))
-  silent execute "!curl -fLo " .. s:plug_file .. " --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim"
-  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+if has("unix")
+  if empty(glob(s:plug_file))
+    silent execute "!curl -fLo " .. s:plug_file .. " --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim"
+    autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+  endif
+  " TODO: win32
 endif
 
 " plugins list {{{2
 call plug#begin()
+
 " colorschemes {{{3
 Plug 'overcache/NeoSolarized'
+
 " basic editing {{{3
+
 " surrounds
 Plug 'tpope/vim-surround'
+
 " auto-closing parens
 Plug 'tmsvg/pear-tree'
 let g:pear_tree_ft_disabled = [
@@ -48,13 +57,17 @@ let g:pear_tree_repeatable_expand = v:false
 let g:pear_tree_smart_openers = v:true
 let g:pear_tree_smart_closers = v:true
 let g:pear_tree_smart_backspace = v:true
+
 " alignments
 Plug 'junegunn/vim-easy-align'
+
 " faster movements to certain point
 Plug 'justinmk/vim-sneak'
 let g:sneak#label = v:true
+
 " comments
 Plug 'tpope/vim-commentary'
+
 " sessions {{{3
 Plug 'xolox/vim-misc'
 Plug 'xolox/vim-session'
@@ -65,14 +78,17 @@ set sessionoptions+=winpos
 let g:session_autoload = "yes"
 let g:session_autosave = "yes"
 let g:session_default_to_last = v:true
+
 " git {{{3
 Plug 'tpope/vim-fugitive'
 Plug 'mhinz/vim-signify'
 set updatetime=100
 let g:signify_sign_change = '~'
+
 " virtual environments {{{3
 Plug 'jmcantrell/vim-virtualenv'
 let g:virtualenv_stl_format = '(%n)'
+
 " fuzzy search {{{3
 Plug 'junegunn/fzf'
 let g:fzf_layout = {"window": "botright 12 split enew"}
@@ -82,6 +98,7 @@ let g:fzf_action = {
       \ "ctrl-v": "vsplit",
       \}
 Plug 'junegunn/fzf.vim'
+
 " explorer {{{3
 Plug 'preservim/nerdtree'
 let g:NERDTreeWinSize = 40
@@ -91,18 +108,25 @@ let g:NERDTreeQuitOnOpen = v:true
 nnoremap <leader>E <cmd>NERDTreeToggleVCS<cr>
 Plug 'Xuyuanp/nerdtree-git-plugin'
 let g:NERDTreeGitStatusConcealBrackets = v:true
+
 " lsp {{{3
+
 " project {{{3
+
 " snippets {{{3
+
 " misc {{{3
 call plug#end()
+
 " Settings {{{1
+
 " colorscheme {{{2
 set termguicolors
 let $NVIM_TUI_ENABLE_TRUE_COLOR = v:true
 let g:neosolarized_italic = v:true
 set background=dark
 colorscheme MyNeoSolarized
+
 " interface {{{2
 " numbered lines
 set number relativenumber
@@ -140,6 +164,7 @@ augroup cursor_line
   " disable cursorline in inactive windows
   autocmd WinLeave * setlocal nocursorline
 augroup end
+
 " statusline {{{3
 function! s:statusline()
   let stl   = "%#stl_venv#%(%{VirtualEnvStatusline()} %)"
@@ -168,6 +193,7 @@ augroup statusline
   autocmd WinEnter,BufWinEnter * let &l:statusline = "%!" .. expand("<SID>") .. "statusline()"
   autocmd WinLeave * let &l:statusline = "%!" .. expand("<SID>") .. "statusline_nc()"
 augroup end
+
 " tabline {{{3
 function! s:tabline()
   let tbl = ""
@@ -178,36 +204,8 @@ function! s:tabline()
       let label = "%#Tabline#"
     endif
     let label ..= "%" .. a:tabpagenr .. "T "
-    function! s:tabline_modified(tabpagenr)
-      for winnr in range(1, tabpagewinnr(a:tabpagenr, "$"))
-        if gettabwinvar(a:tabpagenr, winnr, "&modified")
-          return "+"
-        endif
-      endfor
-      return ""
-    endfunction
-    let label ..= "%{" .. expand("<SID>") .. "tabline_modified(" .. a:tabpagenr .. ")} "
-    function! s:tabline_filename(tabpagenr)
-      let winnr = tabpagewinnr(a:tabpagenr)
-      let bufnr = tabpagebuflist(a:tabpagenr)[winnr - 1]
-      let bufname = bufname(bufnr)
-      let filename = fnamemodify(bufname, ":t")
-      let full_bufname = fnamemodify(bufname, ":p")
-      " special cases
-      " terminal buffers
-      if full_bufname =~# '\v^term://'
-        let splitted_term_uri = split(full_bufname, ":")
-        let shell_pid = fnamemodify(splitted_term_uri[1], ":t")
-        let shell_exec = fnamemodify(splitted_term_uri[-1], ":t")
-        return join([splitted_term_uri[0], shell_pid, shell_exec], ":")
-      endif
-      if empty(filename)
-        return "[No Name]"
-      endif
-      " basic case
-      return filename
-    endfunction
-    let label ..= "%{" .. expand("<SID>") .. "tabline_filename(" .. a:tabpagenr .. ")} "
+    let label ..= "%{tbl#tabline_modified(" .. a:tabpagenr .. ")} "
+    let label ..= "%{tbl#tabline_filename(" .. a:tabpagenr .. ")} "
     let label ..= a:tabpagenr .. "|"
     return label
   endfunction
@@ -219,9 +217,10 @@ function! s:tabline()
   return tbl
 endfunction
 let &tabline = "%!" .. expand("<SID>") .. "tabline()"
+
 " terminal {{{2
 " use Esc for leaving insert mode in terminal
-tnoremap <esc> <c-\><c-n>
+tnoremap <expr> <esc> &filetype =~# 'fzf' ? "\<esc>" : "\<c-\>\<c-n>"
 augroup terminal_settings
   autocmd!
   autocmd TermOpen * setlocal nonumber norelativenumber signcolumn=no
@@ -236,10 +235,11 @@ augroup terminal_settings
   " leave insert mode when leaving terminal
   autocmd TermLeave,BufLeave,WinLeave term://* stopinsert
 augroup end
+
 " actions running on terminal start {{{3
 " python virtualenv activation
 " uses $VIRTUAL_ENV variable that should be set by DEP: vim-virtualenv plugin
-augroup pyvenv_activation
+augroup terminal_pyvenv_activation
   autocmd!
   function! s:activate_pyvenv()
     if exists("$VIRTUAL_ENV") && !empty(expand("$VIRTUAL_ENV"))
@@ -266,8 +266,9 @@ augroup pyvenv_activation
     endif
   endfunction
   " every terminal except for terminals opened by FZF
-  autocmd TermOpen *[^{FZF$}] call s:activate_pyvenv()
+  autocmd TermOpen *[^{FZF$}] call <sid>activate_pyvenv()
 augroup end
+
 " movements {{{2
 " use Alt modifier for easy window switching regardless of mode
 nnoremap <a-h> <c-w>h
@@ -306,6 +307,7 @@ noremap H ^
 noremap L $
 " easier switching between alternate buffers
 nnoremap <backspace> <c-^>
+
 " formatting {{{2
 set expandtab
 set tabstop=4 softtabstop=4 shiftwidth=4 shiftround
@@ -327,6 +329,7 @@ nnoremap <silent> ]<space> :<c-u>call <sid>empty_lines(v:count1, v:false)<cr>
 " automatically replace tabs with spaces on saving
 " set this to false to turn off this behavior
 let g:autoretab = v:true
+command! AutoRetabToggle let g:autoretab = !g:autoretab
 augroup auto_retab
   autocmd!
   autocmd BufWrite * if g:autoretab | retab | endif
@@ -334,6 +337,7 @@ augroup end
 " automatically remove trailing spaces
 " set this to false to turn off this behavior
 let g:autoremove_trail_spaces = v:true
+command! AutoRemoveTrailSpaceToggle let g:autoremove_trail_spaces = !g:autoremove_trail_spaces
 augroup auto_remove_trail_space
   autocmd!
   function! s:remove_trail_space()
@@ -346,6 +350,7 @@ augroup auto_remove_trail_space
   endfunction
   autocmd BufWrite * if g:autoremove_trail_spaces | call <sid>remove_trail_space() | endif
 augroup end
+
 " searching {{{2
 set ignorecase
 set smartcase
@@ -391,9 +396,11 @@ function! s:search_jump(direction)
 endfunction
 nnoremap <silent> ]s :<c-u>call <sid>search_jump("forward")<cr>
 nnoremap <silent> [s :<c-u>call <sid>search_jump("backward")<cr>
+
 " git {{{2
 nnoremap <silent> cd <cmd>SignifyHunkDiff<cr>
 nnoremap <silent> cu <cmd>SignifyHunkUndo<crs:>
+
 " git & fuzzy search {{{2
 " searching and switching to git branches
 function! s:execute_git(git_dir, command)
@@ -413,10 +420,8 @@ function! s:execute_git(git_dir, command)
 endfunction
 function! GitBranches()
   let dict = {
-        \ "source": filter(
-        \             filter(s:execute_git(FugitiveGitDir(), "branch -a"),
-        \             {_, b -> !empty(b)}),
-        \           {_, b -> b !~# '\v^\s*remotes/.{-}/HEAD\s+-\>\s+'})
+        \ "source": filter(s:execute_git(FugitiveGitDir(), "branch -a"),
+        \           {_, b -> !empty(b) && b !~# '\v^\s*remotes/.{-}/HEAD\s+-\>\s+'})
         \}
   function! dict.sink(lines)
     if a:lines !~# '\v^\s*\*'
@@ -427,5 +432,6 @@ function! GitBranches()
   call fzf#run(fzf#wrap(dict))
 endfunction
 command! GitBranches call GitBranches()
+
 " }}}
 " vim:foldmethod=marker

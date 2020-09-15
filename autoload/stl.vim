@@ -28,7 +28,7 @@ function! stl#filename()
     let splitted_term_uri = split(full_bufname, ":")
     let shell_pid = fnamemodify(splitted_term_uri[1], ":t")
     let shell_exec = fnamemodify(splitted_term_uri[-1], ":t")
-    return join(splitted_term_uri[0], shell_pid, shell_exec], ":")
+    return join([splitted_term_uri[0], shell_pid, shell_exec], ":")
   endif
   " buffer without file
   if empty(filename)
