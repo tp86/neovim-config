@@ -68,6 +68,10 @@ let g:sneak#label = v:true
 " comments
 Plug 'tpope/vim-commentary'
 
+" rainbow parentheses (works only for some filetypes, lisps mostly)
+Plug 'junegunn/rainbow_parentheses.vim'
+let g:rainbow#max_level = 24
+
 " sessions {{{3
 Plug 'xolox/vim-misc'
 Plug 'xolox/vim-session'
@@ -112,8 +116,13 @@ let g:NERDTreeGitStatusConcealBrackets = v:true
 " lsp {{{3
 
 " project {{{3
+Plug 'tpope/vim-projectionist'
 
 " snippets {{{3
+Plug 'SirVer/Ultisnips'
+let g:UltiSnipsExpandTrigger = "<tab>"
+let g:UltiSnipsJumpForwardTrigger = "<tab>"
+let g:UltiSnipsJumpBackwardTrigger = "<s-tab>"
 
 " misc {{{3
 call plug#end()
@@ -220,6 +229,7 @@ let &tabline = "%!" .. expand("<SID>") .. "tabline()"
 
 " terminal {{{2
 " use Esc for leaving insert mode in terminal
+" except for terminals opened by FZF
 tnoremap <expr> <esc> &filetype =~# 'fzf' ? "\<esc>" : "\<c-\>\<c-n>"
 augroup terminal_settings
   autocmd!
