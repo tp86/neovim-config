@@ -113,8 +113,6 @@ nnoremap <leader>E <cmd>NERDTreeToggleVCS<cr>
 Plug 'Xuyuanp/nerdtree-git-plugin'
 let g:NERDTreeGitStatusConcealBrackets = v:true
 
-" lsp {{{3
-
 " project {{{3
 Plug 'tpope/vim-projectionist'
 
@@ -143,9 +141,14 @@ let g:completion_trigger_keyword_length = 3
 " v:true doesn't work here
 let g:completion_trigger_on_delete = 1
 
+" lsp {{{3
+Plug 'neovim/nvim-lspconfig'
+
 call plug#end()
 
 " Settings {{{1
+
+set hidden
 
 " colorscheme {{{2
 set termguicolors
@@ -293,8 +296,11 @@ augroup terminal_pyvenv_activation
       call chansend(getbufvar("%", "terminal_job_id"), activation_cmd .. "\<cr>")
     endif
   endfunction
+  function! s:terminal_on_open()
+    call s:activate_pyvenv()
+  endfunction
   " every terminal except for terminals opened by FZF
-  autocmd TermOpen *[^{FZF$}] call <sid>activate_pyvenv()
+  autocmd TermOpen *[^{FZF$}] call <sid>terminal_on_open()
 augroup end
 
 " movements {{{2
@@ -460,6 +466,19 @@ function! GitBranches()
   call fzf#run(fzf#wrap(dict))
 endfunction
 command! GitBranches call GitBranches()
+
+" LSPs {{{2
+lua <<EOF
+local nvim_lsp = require'nvim_lsp'
+
+nvim_lsp.pyls.setup{
+  cmd = { "pyls" },
+  filetypes = { "python" },
+  root_dir = function(fname)
+    return nvim_lsp.util.find_git_ancestor(fname) or vim.loop.cwd()
+  end
+}
+EOF
 
 " }}}
 " vim:foldmethod=marker
