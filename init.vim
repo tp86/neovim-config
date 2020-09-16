@@ -124,7 +124,25 @@ let g:UltiSnipsExpandTrigger = "<tab>"
 let g:UltiSnipsJumpForwardTrigger = "<tab>"
 let g:UltiSnipsJumpBackwardTrigger = "<s-tab>"
 
-" misc {{{3
+" completion {{{3
+Plug 'nvim-lua/completion-nvim'
+set completeopt=menuone,noinsert,noselect
+augroup completion_nvim_every_buffer
+  autocmd!
+  autocmd BufEnter * lua require'completion'.on_attach()
+augroup end
+inoremap <silent><expr> <c-space> completion#trigger_completion()
+let g:completion_enable_snippet = 'UltiSnips'
+" use TAB for expanding snippets (as in UltiSnips) and confirming selections
+let g:completion_confirm_key = ""
+imap <expr> <tab> pumvisible() ? complete_info()["selected"] != "-1" ?
+      \ "\<plug>(completion_confirm_completion)" : "\<c-e>\<tab>" : "\<tab>"
+let g:completion_matching_strategy_list = ['exact']
+let g:completion_matching_ignore_case = 1
+let g:completion_trigger_keyword_length = 3
+" v:true doesn't work here
+let g:completion_trigger_on_delete = 1
+
 call plug#end()
 
 " Settings {{{1
@@ -258,19 +276,19 @@ augroup terminal_pyvenv_activation
       " command that is running in terminal (usually, shell)
       let cmd = join(split(bufname(), ":")[2:-1], ":")
       if has("win32")
-        let activation_script = expand(pyvenv_path .. "/Scripts/activate")
+        let activation_script = expand(pyvenv_path .. "Scripts/activate")
         " we might be running Bash on Windows inside terminal
         if cmd =~# '\vsh(\.|$)'
           " clear whole command line and source activation script restoring
           " correct slashes for terminal's shell
-          let activation_cmd = "\<c-e><c-u>source " .. substitute(activation_script, '\', '/', "g")
+          let activation_cmd = "\<c-e>\<c-u>source " .. substitute(activation_script, '\', '/', "g")
         else
           " clear cmd line and append bat extension for Windows' cmd.exe
           let activation_cmd = "\<esc>" .. activation_script .. ".bat"
         endif
       elseif has("unix")
-        let activation_script = expand(pyvenv_path .. "/bin/activate")
-        let activation_cmd = "\<c-e><c-u>source " .. activation_script
+        let activation_script = expand(pyvenv_path .. "bin/activate")
+        let activation_cmd = "\<c-e>\<c-u>source " .. activation_script
       endif
       call chansend(getbufvar("%", "terminal_job_id"), activation_cmd .. "\<cr>")
     endif
