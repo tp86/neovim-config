@@ -143,6 +143,7 @@ let g:completion_trigger_on_delete = 1
 
 " lsp {{{3
 Plug 'neovim/nvim-lspconfig'
+Plug 'nvim-lua/diagnostic-nvim'
 
 call plug#end()
 
@@ -468,16 +469,58 @@ endfunction
 command! GitBranches call GitBranches()
 
 " LSPs {{{2
+function! LspBufCommands()
+  function! s:lsp_reload_client()
+    lua vim.lsp.stop_client(vim.lsp.buf_get_clients())
+    w
+    e
+  endfunction
+  command! -buffer LspReload :call <sid>lsp_reload_client()<cr>
+  command! -buffer LspCodeAction :lua vim.lsp.buf.code_action()<cr>
+endfunction
 lua <<EOF
 local nvim_lsp = require'nvim_lsp'
+local completion = require'completion'
+local diagnostic = require'diagnostic'
+
+local on_attach_vim = function(client)
+  completion.on_attach(client)
+  diagnostic.on_attach(client)
+
+  vim.fn.LspBufCommands()
+
+  vim.api.nvim_command("command! -buffer LspCodeAction :lua vim.lsp.buf.code_action()<cr>")
+  vim.api.nvim_command("command! -buffer ShowDiagnostic :lua vim.lsp.util.show_line_diagnostics()<cr>")
+  vim.fn.nvim_set_keymap("n", "g?", "<cmd>ShowDiagnostic<cr>", {noremap = true, silent = true})
+
+  vim.fn.nvim_set_keymap("n", "gd", "<cmd>lua vim.lsp.buf.declaration()<cr>", {noremap = true, silent = true})
+  vim.fn.nvim_set_keymap("n", "<c-]>", "<cmd>lua vim.lsp.buf.definition()<cr>", {noremap = true, silent = true})
+  vim.fn.nvim_set_keymap("n", "gh", "<cmd>lua vim.lsp.buf.hover()<cr>", {noremap = true, silent = true})
+  vim.fn.nvim_set_keymap("n", "gD", "<cmd>lua vim.lsp.buf.implementation()<cr>", {noremap = true, silent = true})
+  vim.fn.nvim_set_keymap("n", "<c-i>", "<cmd>lua vim.lsp.buf.signature_help()<cr>", {noremap = true, silent = true})
+  vim.fn.nvim_set_keymap("n", "gT", "<cmd>lua vim.lsp.buf.type_definition()<cr>", {noremap = true, silent = true})
+  vim.fn.nvim_set_keymap("n", "gr", "<cmd>lua vim.lsp.buf.references()<cr>", {noremap = true, silent = true})
+  vim.fn.nvim_set_keymap("n", "g@", "<cmd>lua vim.lsp.buf.document_symbol()<cr>", {noremap = true, silent = true})
+  vim.fn.nvim_set_keymap("n", "gW", "<cmd>lua vim.lsp.buf.workspace_symbol()<cr>", {noremap = true, silent = true})
+
+  -- completion for server commands
+
+  -- vim.api.nvim_command("command! -buffer -nargs=1 LspServerCommand :lua vim.lsp.buf.execute_command(<q-args>)<cr>")
+end
 
 nvim_lsp.pyls.setup{
   cmd = { "pyls" },
   filetypes = { "python" },
   root_dir = function(fname)
     return nvim_lsp.util.find_git_ancestor(fname) or vim.loop.cwd()
-  end
+  end,
+  on_attach = on_attach_vim
 }
+
+nvim_lsp.vimls.setup{
+  on_attach = on_attach_vim
+}
+
 EOF
 
 " }}}
