@@ -12,8 +12,8 @@ highlight! stl_venv guifg=#719e07 gui=reverse guibg=Black
 highlight! stl_cwd guifg=#719e07 gui=bold,reverse guibg=White
 highlight! stl_git guifg=#b58900
 execute "highlight! stl_filename guifg=" .. s:stl_fg
-execute "highlight! stl_lsp_ok guifg=#719e07 gui=bold guibg=" .. s:stl_fg
-execute "highlight! stl_lsp_err guifg=#dc322f gui=bold guibg=" .. s:stl_fg
+" execute "highlight! stl_lsp_ok guifg=#719e07 gui=bold guibg=" .. s:stl_fg
+" execute "highlight! stl_lsp_err guifg=#dc322f gui=bold guibg=" .. s:stl_fg
 
 " signcolumn colors
 let signcolumn_bg = synIDattr(synIDtrans(highlightID("SignColumn")), "bg", "gui")

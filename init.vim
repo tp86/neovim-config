@@ -147,6 +147,7 @@ let g:completion_trigger_on_delete = 1
 " lsp {{{3
 Plug 'neovim/nvim-lspconfig'
 Plug 'nvim-lua/diagnostic-nvim'
+Plug 'nvim-lua/lsp-status.nvim'
 Plug 'RishabhRD/popfix'
 Plug 'RishabhRD/nvim-lsputils'
 
@@ -209,10 +210,8 @@ function! s:statusline()
   let stl ..= "%#stl_filename# %{stl#filename()} %m%r"
   let stl ..= "%*"
   let stl ..= "%="
+  let stl ..= "%(%{stl#lsp()} %)"
   let stl ..= "%($[%{xolox#session#find_current_session()}] %)"
-  let stl ..= "%(%#stl_lsp_ok#%{stl#lsp()==0?'o':''}" ..
-        \      "%#stl_lsp_err#%{stl#lsp()==1?'x':''}" ..
-        \      "%* %)"
   let stl ..= "\u2261%p%%"
   return stl
 endfunction

@@ -4,10 +4,21 @@ local diagnostic = require'diagnostic'
 local code_action = require'lsputil.codeAction'
 local locations = require'lsputil.locations'
 local symbols = require'lsputil.symbols'
+local status = require'lsp-status'
+status.register_progress()
+status.config({
+    indicator_errors = 'E',
+    indicator_warnings = 'W',
+    indicator_info = 'i',
+    indicator_hint = '?',
+    indicator_ok = '-',
+    status_symbol = 'LSP: '
+})
 
 local custom_attach = function(client)
     completion.on_attach(client)
     diagnostic.on_attach(client)
+    status.on_attach(client)
 
     vim.fn.LspBufCommands()
     -- ShowDiagnostic command is defined in init.vim
@@ -46,9 +57,11 @@ nvim_lsp.pyls.setup{
     root_dir = function(fname)
         return nvim_lsp.util.find_git_ancestor(fname) or vim.loop.cwd()
     end,
-    on_attach = custom_attach
+    on_attach = custom_attach,
+    capabilities = status.capabilities
 }
 
 nvim_lsp.vimls.setup{
-    on_attach = custom_attach
+    on_attach = custom_attach,
+    capabilities = status.capabilities
 }

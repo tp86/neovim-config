@@ -51,7 +51,9 @@ function! stl#filename()
     return expand(join([pathshorten(relative_dir), filename], "/"))
   endif
 endfunction
-function! stl#lsp()
-  " TODO
-  return 2
+function! stl#lsp() abort
+  if luaeval('#vim.lsp.buf_get_clients() > 0')
+    return luaeval("require('lsp-status').status()")
+  endif
+  return ""
 endfunction
