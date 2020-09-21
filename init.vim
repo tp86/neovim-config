@@ -29,12 +29,14 @@ let maplocalleader = " "
 " taken from https://github.com/junegunn/vim-plug/wiki/tips#automatic-installation
 " requires DEP: curl
 let s:plug_file = s:vim_home_ .. expand("autoload/plug.vim")
-if has("unix")
-  if empty(glob(s:plug_file))
-    silent execute "!curl -fLo " .. s:plug_file .. " --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim"
-    autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+if empty(glob(s:plug_file))
+  let s:curl_cmd = "curl"
+  " on Windows, neovim nightly comes with curl executable in Neovim's directory
+  if has("win32")
+    let s:curl_cmd ..= ".exe"
   endif
-  " TODO: win32
+  silent execute "!" .. s:curl_cmd .. " -fLo " .. s:plug_file .. " --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim"
+  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
 
 " plugins list {{{2
@@ -90,6 +92,7 @@ set updatetime=100
 let g:signify_sign_change = '~'
 
 " virtual environments {{{3
+" requires python provider setup
 Plug 'jmcantrell/vim-virtualenv'
 let g:virtualenv_stl_format = '(%n)'
 
@@ -144,6 +147,8 @@ let g:completion_trigger_on_delete = 1
 " lsp {{{3
 Plug 'neovim/nvim-lspconfig'
 Plug 'nvim-lua/diagnostic-nvim'
+Plug 'RishabhRD/popfix'
+Plug 'RishabhRD/nvim-lsputils'
 
 call plug#end()
 
@@ -155,7 +160,7 @@ set hidden
 set termguicolors
 let $NVIM_TUI_ENABLE_TRUE_COLOR = v:true
 let g:neosolarized_italic = v:true
-set background=dark
+set background=light
 colorscheme MyNeoSolarized
 
 " interface {{{2
@@ -469,59 +474,20 @@ endfunction
 command! GitBranches call GitBranches()
 
 " LSPs {{{2
+" called during LSP server setup for buffer
 function! LspBufCommands()
   function! s:lsp_reload_client()
     lua vim.lsp.stop_client(vim.lsp.buf_get_clients())
     w
     e
   endfunction
-  command! -buffer LspReload :call <sid>lsp_reload_client()<cr>
-  command! -buffer LspCodeAction :lua vim.lsp.buf.code_action()<cr>
+  command! -buffer LspReload call <sid>lsp_reload_client()
+  command! -buffer LspCodeAction lua vim.lsp.buf.code_action()
+  command! -buffer ShowDiagnostic lua vim.lsp.util.show_line_diagnostics()
+  command! -buffer LspIncomingCalls lua vim.lsp.buf.incoming_calls()
+  command! -buffer LspOutgoingCalls lua vim.lsp.buf.outgoing_calls()
 endfunction
-lua <<EOF
-local nvim_lsp = require'nvim_lsp'
-local completion = require'completion'
-local diagnostic = require'diagnostic'
-
-local on_attach_vim = function(client)
-  completion.on_attach(client)
-  diagnostic.on_attach(client)
-
-  vim.fn.LspBufCommands()
-
-  vim.api.nvim_command("command! -buffer LspCodeAction :lua vim.lsp.buf.code_action()<cr>")
-  vim.api.nvim_command("command! -buffer ShowDiagnostic :lua vim.lsp.util.show_line_diagnostics()<cr>")
-  vim.fn.nvim_set_keymap("n", "g?", "<cmd>ShowDiagnostic<cr>", {noremap = true, silent = true})
-
-  vim.fn.nvim_set_keymap("n", "gd", "<cmd>lua vim.lsp.buf.declaration()<cr>", {noremap = true, silent = true})
-  vim.fn.nvim_set_keymap("n", "<c-]>", "<cmd>lua vim.lsp.buf.definition()<cr>", {noremap = true, silent = true})
-  vim.fn.nvim_set_keymap("n", "gh", "<cmd>lua vim.lsp.buf.hover()<cr>", {noremap = true, silent = true})
-  vim.fn.nvim_set_keymap("n", "gD", "<cmd>lua vim.lsp.buf.implementation()<cr>", {noremap = true, silent = true})
-  vim.fn.nvim_set_keymap("n", "<c-i>", "<cmd>lua vim.lsp.buf.signature_help()<cr>", {noremap = true, silent = true})
-  vim.fn.nvim_set_keymap("n", "gT", "<cmd>lua vim.lsp.buf.type_definition()<cr>", {noremap = true, silent = true})
-  vim.fn.nvim_set_keymap("n", "gr", "<cmd>lua vim.lsp.buf.references()<cr>", {noremap = true, silent = true})
-  vim.fn.nvim_set_keymap("n", "g@", "<cmd>lua vim.lsp.buf.document_symbol()<cr>", {noremap = true, silent = true})
-  vim.fn.nvim_set_keymap("n", "gW", "<cmd>lua vim.lsp.buf.workspace_symbol()<cr>", {noremap = true, silent = true})
-
-  -- completion for server commands
-
-  -- vim.api.nvim_command("command! -buffer -nargs=1 LspServerCommand :lua vim.lsp.buf.execute_command(<q-args>)<cr>")
-end
-
-nvim_lsp.pyls.setup{
-  cmd = { "pyls" },
-  filetypes = { "python" },
-  root_dir = function(fname)
-    return nvim_lsp.util.find_git_ancestor(fname) or vim.loop.cwd()
-  end,
-  on_attach = on_attach_vim
-}
-
-nvim_lsp.vimls.setup{
-  on_attach = on_attach_vim
-}
-
-EOF
+lua require'lsp'
 
 " }}}
 " vim:foldmethod=marker
