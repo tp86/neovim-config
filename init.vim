@@ -210,7 +210,7 @@ augroup end
 function! s:statusline()
   let stl   = "%#stl_venv#%(%{VirtualEnvStatusline()} %)"
   let stl ..= "%#stl_cwd#%{pathshorten(fnamemodify(getcwd(), ':p')[:-2])}"
-  let stl ..= "%#stl_git#%( (%{pathshorten(FugitiveHead(8))})%)%(%{stl#git_stats()}%)"
+  let stl ..= "%#stl_git#%( (%{pathshorten(FugitiveHead(8))})%)"
   let stl ..= "%#stl_filename# %{stl#filename()} %m%r"
   let stl ..= "%*"
   let stl ..= "%="
