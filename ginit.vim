@@ -32,6 +32,7 @@ function! s:insert_put()
   return keys
 endfunction
 inoremap <expr> <c-v> <sid>insert_put()
+tnoremap <c-v> <c-\><c-n>"+pa
 " restore option to insert verbose character
 inoremap <c-g><c-v> <c-v>
 

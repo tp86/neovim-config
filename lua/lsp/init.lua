@@ -23,6 +23,8 @@ local custom_attach = function(client)
     vim.fn.LspBufCommands()
     -- ShowDiagnostic command is defined in init.vim
     vim.fn.nvim_buf_set_keymap(0, "n", "g?", "<cmd>ShowDiagnostic<cr>", {noremap = true, silent = true})
+    vim.fn.nvim_buf_set_keymap(0, "n", "[d", "<cmd>PrevDiagnostic<cr>", {noremap = true, silent = true})
+    vim.fn.nvim_buf_set_keymap(0, "n", "]d", "<cmd>NextDiagnostic<cr>", {noremap = true, silent = true})
 
     vim.fn.nvim_buf_set_keymap(0, "n", "gD", "<cmd>lua vim.lsp.buf.declaration()<cr>", {noremap = true, silent = true})
     vim.fn.nvim_buf_set_keymap(0, "n", "gd", "<cmd>lua vim.lsp.buf.definition()<cr>", {noremap = true, silent = true})

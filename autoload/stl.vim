@@ -36,7 +36,7 @@ function! stl#filename()
   endif
   " basic case
   function! s:relative_path(path, base_path)
-    let full_base_path = escape(fnamemodify(a:base_path, ":p"), '\')
+    let full_base_path = escape(fnamemodify(a:base_path, ":p"), '\%')
     let relative_path = matchstr(a:path, '\v' .. full_base_path .. '\zs.*$')
     if empty(relative_path)
       return a:path
