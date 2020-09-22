@@ -57,3 +57,10 @@ function! stl#lsp() abort
   endif
   return ""
 endfunction
+function! stl#git_stats()
+  if empty(FugitiveGitDir()) || index(['fugitive', 'nerdtree'], &filetype) >= 0
+    return ""
+  endif
+  let [a, m, r] = GitGutterGetHunkSummary()
+  return printf("[+%d ~%d -%d]", a, m, r)
+endfunction

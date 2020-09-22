@@ -87,9 +87,10 @@ let g:session_default_to_last = v:true
 
 " git {{{3
 Plug 'tpope/vim-fugitive'
-Plug 'mhinz/vim-signify'
+" Plug 'mhinz/vim-signify'
+Plug 'airblade/vim-gitgutter'
 set updatetime=100
-let g:signify_sign_change = '~'
+" let g:signify_sign_change = '~'
 
 " virtual environments {{{3
 " requires python provider setup
@@ -206,7 +207,7 @@ augroup end
 function! s:statusline()
   let stl   = "%#stl_venv#%(%{VirtualEnvStatusline()} %)"
   let stl ..= "%#stl_cwd#%{pathshorten(fnamemodify(getcwd(), ':p')[:-2])}"
-  let stl ..= "%#stl_git#%( (%{pathshorten(FugitiveHead(8))})%)%(%{sy#repo#get_stats_decorated()}%)"
+  let stl ..= "%#stl_git#%( (%{pathshorten(FugitiveHead(8))})%)%(%{stl#git_stats()}%)"
   let stl ..= "%#stl_filename# %{stl#filename()} %m%r"
   let stl ..= "%*"
   let stl ..= "%="
