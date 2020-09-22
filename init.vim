@@ -127,7 +127,10 @@ let g:UltiSnipsJumpForwardTrigger = "<tab>"
 let g:UltiSnipsJumpBackwardTrigger = "<s-tab>"
 
 " completion {{{3
-Plug 'nvim-lua/completion-nvim'
+function! ApplyPatch(patch)
+  call system("git apply " .. s:vim_home_ .. "patches/" .. a:patch)
+endfunction
+Plug 'nvim-lua/completion-nvim', { 'do': ':call ApplyPatch(\"completion.patch\")' }
 set completeopt=menuone,noinsert,noselect
 augroup completion_nvim_every_buffer
   autocmd!

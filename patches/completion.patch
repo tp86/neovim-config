@@ -1,0 +1,13 @@
+diff --git a/lua/completion/source/snippet.lua b/lua/completion/source/snippet.lua
+index 444e6c2..618709a 100644
+--- a/lua/completion/source/snippet.lua
++++ b/lua/completion/source/snippet.lua
+@@ -6,7 +6,7 @@ local M = {}
+ 
+ M.getUltisnipItems = function(prefix)
+   if vim.fn.exists("*UltiSnips#SnippetsInCurrentScope") == 0 then return {} end
+-  local snippetsList = api.nvim_call_function('UltiSnips#SnippetsInCurrentScope', {})
++  local snippetsList = vim.fn['UltiSnips#SnippetsInCurrentScope']()
+   local complete_items = {}
+   if vim.tbl_isempty(snippetsList) then
+     return {}
