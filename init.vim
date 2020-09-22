@@ -438,8 +438,8 @@ nnoremap <silent> ]s :<c-u>call <sid>search_jump("forward")<cr>
 nnoremap <silent> [s :<c-u>call <sid>search_jump("backward")<cr>
 
 " git {{{2
-nnoremap <silent> cd <cmd>SignifyHunkDiff<cr>
-nnoremap <silent> cu <cmd>SignifyHunkUndo<cr>
+nnoremap <silent> cd <cmd>GitGutterPreviewHunk<cr>
+nnoremap <silent> cu <cmd>GitGutterUndoHunk<cr>
 
 " git & fuzzy search {{{2
 " searching and switching to git branches
