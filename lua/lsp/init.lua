@@ -1,9 +1,9 @@
 local nvim_lsp = require'nvim_lsp'
 local completion = require'completion'
 local diagnostic = require'diagnostic'
-local code_action = require'lsputil.codeAction'
-local locations = require'lsputil.locations'
-local symbols = require'lsputil.symbols'
+-- local code_action = require'lsputil.codeAction'
+-- local locations = require'lsputil.locations'
+-- local symbols = require'lsputil.symbols'
 local status = require'lsp-status'
 status.register_progress()
 status.config({
@@ -42,14 +42,14 @@ local custom_attach = function(client)
     -- TODO: completion for server commands
     -- vim.api.nvim_command("command! -buffer -nargs=1 LspServerCommand :lua vim.lsp.buf.execute_command(<q-args>)<cr>")
 
-    vim.lsp.callbacks['textDocument/codeAction'] = code_action.code_action_handler
-    vim.lsp.callbacks['textDocument/references'] = locations.references_handler
-    vim.lsp.callbacks['textDocument/definition'] = locations.definition_handler
-    vim.lsp.callbacks['textDocument/declaration'] = locations.declaration_handler
-    vim.lsp.callbacks['textDocument/typeDefinition'] = locations.typeDefinition_handler
-    vim.lsp.callbacks['textDocument/implementation'] = locations.implementation_handler
-    vim.lsp.callbacks['textDocument/documentSymbol'] = symbols.document_handler
-    vim.lsp.callbacks['workspace/symbol'] = symbols.workspace_handler
+    -- vim.lsp.callbacks['textDocument/codeAction'] = code_action.code_action_handler
+    -- vim.lsp.callbacks['textDocument/references'] = locations.references_handler
+    -- vim.lsp.callbacks['textDocument/definition'] = locations.definition_handler
+    -- vim.lsp.callbacks['textDocument/declaration'] = locations.declaration_handler
+    -- vim.lsp.callbacks['textDocument/typeDefinition'] = locations.typeDefinition_handler
+    -- vim.lsp.callbacks['textDocument/implementation'] = locations.implementation_handler
+    -- vim.lsp.callbacks['textDocument/documentSymbol'] = symbols.document_handler
+    -- vim.lsp.callbacks['workspace/symbol'] = symbols.workspace_handler
     print("LSP started.")
 end
 

@@ -2,9 +2,6 @@
 "   - clipboard
 "   - python
 
-" temporary for development {{{1
-nnoremap <silent> <space>ws :w<cr>:so %<cr>
-
 " base Neovim directory {{{1
 let s:vim_home = expand(fnamemodify($MYVIMRC, ":p:h"))
 if has("unix")
@@ -79,6 +76,7 @@ Plug 'xolox/vim-misc'
 Plug 'xolox/vim-session'
 let g:session_directory = s:vim_home_ .. "sessions"
 set sessionoptions-=help
+set sessionoptions-=buffers
 set sessionoptions+=resize
 set sessionoptions+=winpos
 let g:session_autoload = "yes"
@@ -152,8 +150,8 @@ let g:completion_trigger_on_delete = 1
 Plug 'neovim/nvim-lspconfig'
 Plug 'nvim-lua/diagnostic-nvim'
 Plug 'nvim-lua/lsp-status.nvim'
-Plug 'RishabhRD/popfix'
-Plug 'RishabhRD/nvim-lsputils'
+" Plug 'RishabhRD/popfix'
+" Plug 'RishabhRD/nvim-lsputils'
 
 call plug#end()
 

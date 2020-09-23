@@ -53,7 +53,22 @@ function! stl#filename()
 endfunction
 function! stl#lsp() abort
   if luaeval('#vim.lsp.buf_get_clients() > 0')
-    return luaeval("require('lsp-status').status()")
+    let diagnostics = luaeval("require('lsp-status').diagnostics()")
+    let errors = get(diagnostics, "errors", 0)
+    let warnings = get(diagnostics, "warnings", 0)
+    let info = get(diagnostics, "info", 0)
+    let hints = get(diagnostics, "hints", 0)
+    let diagnostics_count = errors + warnings + info + hints
+    if diagnostics_count > 0
+      let status_string = ""
+      let status_string ..= (errors > 0 ? "E:"..errors : "")
+      let status_string ..= (warnings > 0 ? "W:"..warnings : "")
+      let status_string ..= (info > 0 ? "i:"..info : "")
+      let status_string ..= (hints > 0 ? "?:"..hints : "")
+    else
+      let status_string = "OK"
+    endif
+    return "LSP: "..status_string
   endif
   return ""
 endfunction
