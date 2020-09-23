@@ -269,7 +269,7 @@ augroup terminal_settings
   " option value
   autocmd BufLeave,WinLeave term://* let &sidescrolloff = b:siso
   " automatically enter insert mode when entering terminal
-  autocmd TermOpen,BufEnter,WinEnter term://* startinsert
+  autocmd TermOpen,BufWinEnter term://* startinsert
   " leave insert mode when leaving terminal
   autocmd TermLeave,BufLeave,WinLeave term://* stopinsert
 augroup end
