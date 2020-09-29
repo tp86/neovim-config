@@ -149,6 +149,14 @@ let g:completion_trigger_on_delete = 1
 " lsp {{{3
 Plug 'neovim/nvim-lspconfig'
 Plug 'nvim-lua/diagnostic-nvim'
+let g:diagnostic_enable_virtual_text = 1
+let g:space_before_virtual_text = 5
+let g:diagnostic_enable_underline = 0
+let g:diagnostic_insert_delay = 1
+call sign_define("LspDiagnosticsErrorSign", {"text": "E", "texthl": "LspDiagnosticsError"})
+call sign_define("LspDiagnosticsWarningSign", {"text": "W", "texthl": "LspDiagnosticsWarning"})
+call sign_define("LspDiagnosticsInformationSign", {"text": "i", "texthl": "LspDiagnosticsInformation"})
+call sign_define("LspDiagnosticsHintSign", {"text": "?", "texthl": "LspDiagnosticsHint"})
 Plug 'nvim-lua/lsp-status.nvim'
 " Plug 'RishabhRD/popfix'
 " Plug 'RishabhRD/nvim-lsputils'
@@ -264,15 +272,16 @@ augroup terminal_settings
   autocmd TermOpen * setlocal nonumber norelativenumber signcolumn=no
   " disable side scrolling offset when entering terminal, remember siso option
   " value in terminal buffer
-  autocmd TermOpen,BufEnter,WinEnter term://* let b:siso = &sidescrolloff | set sidescrolloff=0
-  " enable side scrolling offset when leaving terminal, use remembered siso
-  " option value
-  autocmd BufLeave,WinLeave term://* let &sidescrolloff = b:siso
+  autocmd TermOpen,BufEnter,WinEnter term://* setlocal sidescrolloff=0
+  " " enable side scrolling offset when leaving terminal, use remembered siso
+  " " option value
+  " autocmd BufLeave,WinLeave term://* if exists("b:siso") | let &sidescrolloff = b:siso | else | set sidescrolloff< | endif
   " automatically enter insert mode when entering terminal
   autocmd TermOpen,BufWinEnter term://* startinsert
   " leave insert mode when leaving terminal
   autocmd TermLeave,BufLeave,WinLeave term://* stopinsert
 augroup end
+set scrollback=100000
 
 " actions running on terminal start {{{3
 " python virtualenv activation
@@ -437,6 +446,12 @@ function! s:search_jump(direction)
 endfunction
 nnoremap <silent> ]s :<c-u>call <sid>search_jump("forward")<cr>
 nnoremap <silent> [s :<c-u>call <sid>search_jump("backward")<cr>
+
+" layout automation {{{2
+augroup quickfix_window
+  autocmd!
+  autocmd FileType qf wincmd J
+augroup end
 
 " git {{{2
 nnoremap <silent> cd <cmd>GitGutterPreviewHunk<cr>

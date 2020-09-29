@@ -28,4 +28,24 @@ execute "highlight! SignifySignChangeDelete guifg=" .. signcolumn_delete .. " gu
 highlight! link vimSet NONE
 highlight! link vimSetEqual NONE
 
+" LSP diagnostics colors are cleared on colorscheme reload
+highlight! LspDiagnosticsError guifg=Red
+highlight! link LspDiagnosticsErrorSign LspDiagnosticsError
+highlight! link LspDiagnosticsErrorFloating LspDiagnosticsError
+highlight! LspDiagnosticsWarning guifg=Orange
+highlight! link LspDiagnosticsWarningSign LspDiagnosticsWarning
+highlight! link LspDiagnosticsWarningFloating LspDiagnosticsWarning
+highlight! LspDiagnosticsInformation guifg=LightBlue
+highlight! link LspDiagnosticsInformationSign LspDiagnosticsInformation
+highlight! link LspDiagnosticsInformationFloating LspDiagnosticsInformation
+highlight! LspDiagnosticsHint guifg=LightGrey
+highlight! link LspDiagnosticsHintSign LspDiagnosticsHint
+highlight! link LspDiagnosticsHintFloating LspDiagnosticsHint
+
+" GitGutter signs customization
+highlight! GitGutterAdd guifg=Green guibg=White gui=reverse,bold
+highlight! GitGutterChange guifg=Orange guibg=White gui=reverse,bold
+highlight! GitGutterChangeDelete guifg=Red guibg=White gui=reverse,bold
+highlight! GitGutterDelete guifg=Red guibg=White gui=reverse,bold
+
 let g:colors_name = "MyNeoSolarized"
