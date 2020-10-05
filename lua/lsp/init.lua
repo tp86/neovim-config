@@ -39,6 +39,10 @@ local custom_attach = function(client)
     vim.fn.nvim_buf_set_keymap(0, "n", "<leader><f2>", "<cmd>lua vim.lsp.buf.rename()<cr>", {noremap = true, silent = true})
     vim.fn.nvim_buf_set_keymap(0, "n", "<leader>=", "<cmd>lua vim.lsp.buf.formatting()<cr>", {noremap = true, silent = true})
 
+    vim.api.nvim_command [[autocmd CursorHold  <buffer> lua vim.lsp.buf.clear_references();vim.lsp.buf.document_highlight()]]
+    vim.api.nvim_command [[autocmd CursorHoldI <buffer> lua vim.lsp.buf.clear_references();vim.lsp.buf.document_highlight()]]
+    vim.api.nvim_command [[autocmd CursorMoved <buffer> lua vim.lsp.buf.clear_references()]]
+
     -- TODO: completion for server commands
     -- vim.api.nvim_command("command! -buffer -nargs=1 LspServerCommand :lua vim.lsp.buf.execute_command(<q-args>)<cr>")
 

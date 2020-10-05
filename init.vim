@@ -87,7 +87,7 @@ let g:session_default_to_last = v:true
 Plug 'tpope/vim-fugitive'
 " Plug 'mhinz/vim-signify'
 Plug 'airblade/vim-gitgutter'
-set updatetime=100
+set updatetime=400
 " let g:signify_sign_change = '~'
 
 " virtual environments {{{3
@@ -219,10 +219,10 @@ function! s:statusline()
   let stl ..= "%#stl_git#%( (%{pathshorten(FugitiveHead(8))})%)"
   let stl ..= "%#stl_filename# %{stl#filename()} %m%r"
   let stl ..= "%*"
-  let stl ..= "%="
+  let stl ..= "%= "
   let stl ..= "%(%{stl#lsp()} %)"
   let stl ..= "%($[%{xolox#session#find_current_session()}] %)"
-  let stl ..= "\u2261%p%%"
+  let stl ..= "%5(\u2261%p%%%)"
   return stl
 endfunction
 function! s:statusline_nc()
@@ -301,15 +301,19 @@ augroup terminal_pyvenv_activation
           " clear whole command line and source activation script restoring
           " correct slashes for terminal's shell
           let activation_cmd = "\<c-e>\<c-u>source " .. substitute(activation_script, '\', '/', "g")
-        else
+        elseif cmd =~# 'cmd.exe'
           " clear cmd line and append bat extension for Windows' cmd.exe
           let activation_cmd = "\<esc>" .. activation_script .. ".bat"
+        else
+          let activation_cmd = ""
         endif
       elseif has("unix")
         let activation_script = expand(pyvenv_path .. "bin/activate")
         let activation_cmd = "\<c-e>\<c-u>source " .. activation_script
       endif
-      call chansend(getbufvar("%", "terminal_job_id"), activation_cmd .. "\<cr>")
+      if !empty(activation_cmd)
+        call chansend(getbufvar("%", "terminal_job_id"), activation_cmd .. "\<cr>")
+      endif
     endif
   endfunction
   function! s:terminal_on_open()
