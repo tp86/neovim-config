@@ -1,4 +1,5 @@
 local nvim_lsp = require'nvim_lsp'
+local root_pattern = nvim_lsp.util.root_pattern
 local completion = require'completion'
 local diagnostic = require'diagnostic'
 -- local code_action = require'lsputil.codeAction'
@@ -16,6 +17,7 @@ status.config({
 })
 
 local custom_attach = function(client)
+    vim.lsp.set_log_level(0)
     completion.on_attach(client)
     diagnostic.on_attach(client)
     status.on_attach(client)
@@ -68,6 +70,23 @@ nvim_lsp.pyls.setup{
 }
 
 nvim_lsp.vimls.setup{
+    on_attach = custom_attach,
+    capabilities = status.capabilities
+}
+
+nvim_lsp.clojure_lsp.setup{
+    cmd = { "clojure-lsp.bat" },
+    filetypes = { "clojure" },
+    root_dir = root_pattern("project.clj", ".git"),
+    init_options = {
+        ["project-specs"] = {
+            {
+                ["project-path"] = "project.clj",
+                ["classpath-cmd"] = { "lein.bat", "classpath" }
+            }
+        },
+        ["dependency-scheme"] = { "jar" }
+    },
     on_attach = custom_attach,
     capabilities = status.capabilities
 }

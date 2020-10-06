@@ -4,3 +4,4 @@
 autoload/plug.vim
 .netrwhist
 /UltiSnips/
+/.clj-kondo/

@@ -70,6 +70,10 @@ Plug 'tpope/vim-commentary'
 " rainbow parentheses (works only for some filetypes, lisps mostly)
 Plug 'junegunn/rainbow_parentheses.vim'
 let g:rainbow#max_level = 24
+augroup rainbow_activation
+  autocmd!
+  autocmd FileType clojure RainbowParentheses
+augroup END
 
 " sessions {{{3
 Plug 'xolox/vim-misc'
