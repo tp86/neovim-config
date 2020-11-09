@@ -53,7 +53,8 @@ let s:bg_color = {
       \ "light": "#eee8d5",
       \ "dark": "#073642"
       \}
-execute "highlight! LspReferenceRead guifg=#719e07 guibg="..s:bg_color[&background]
-execute "highlight! LspReferenceWrite guifg=#dc322f guibg="..s:bg_color[&background]
+execute "highlight! LspReferenceRead guifg=Green guibg="..s:bg_color[&background]
+execute "highlight! LspReferenceText guifg=Blue guibg="..s:bg_color[&background]
+execute "highlight! LspReferenceWrite guifg=Red guibg="..s:bg_color[&background]
 
 let g:colors_name = "MyNeoSolarized"

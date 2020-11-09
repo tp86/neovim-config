@@ -17,6 +17,7 @@ status.config({
 })
 
 local custom_attach = function(client)
+    vim.api.nvim_command("echomsg 'Starting LSP'")
     vim.lsp.set_log_level(0)
     completion.on_attach(client)
     diagnostic.on_attach(client)
@@ -24,17 +25,17 @@ local custom_attach = function(client)
 
     vim.fn.LspBufCommands()
     -- ShowDiagnostic command is defined in init.vim
-    vim.fn.nvim_buf_set_keymap(0, "n", "g?", "<cmd>ShowDiagnostic<cr>", {noremap = true, silent = true})
-    vim.fn.nvim_buf_set_keymap(0, "n", "[d", "<cmd>PrevDiagnostic<cr>", {noremap = true, silent = true})
-    vim.fn.nvim_buf_set_keymap(0, "n", "]d", "<cmd>NextDiagnostic<cr>", {noremap = true, silent = true})
+    vim.fn.nvim_buf_set_keymap(0, "n", "<leader>d?", "<cmd>ShowDiagnostic<cr>", {noremap = true, silent = true})
+    vim.fn.nvim_buf_set_keymap(0, "n", "<leader>D", "<cmd>PrevDiagnostic<cr>", {noremap = true, silent = true})
+    vim.fn.nvim_buf_set_keymap(0, "n", "<leader>d", "<cmd>NextDiagnostic<cr>", {noremap = true, silent = true})
 
-    vim.fn.nvim_buf_set_keymap(0, "n", "gD", "<cmd>lua vim.lsp.buf.declaration()<cr>", {noremap = true, silent = true})
-    vim.fn.nvim_buf_set_keymap(0, "n", "gd", "<cmd>lua vim.lsp.buf.definition()<cr>", {noremap = true, silent = true})
-    vim.fn.nvim_buf_set_keymap(0, "n", "gh", "<cmd>lua vim.lsp.buf.hover()<cr>", {noremap = true, silent = true})
-    vim.fn.nvim_buf_set_keymap(0, "n", "gy", "<cmd>lua vim.lsp.buf.implementation()<cr>", {noremap = true, silent = true})
-    vim.fn.nvim_buf_set_keymap(0, "n", "gs", "<cmd>lua vim.lsp.buf.signature_help()<cr>", {noremap = true, silent = true})
-    vim.fn.nvim_buf_set_keymap(0, "n", "gT", "<cmd>lua vim.lsp.buf.type_definition()<cr>", {noremap = true, silent = true})
-    vim.fn.nvim_buf_set_keymap(0, "n", "gr", "<cmd>lua vim.lsp.buf.references()<cr>", {noremap = true, silent = true})
+    vim.fn.nvim_buf_set_keymap(0, "n", "<leader>gD", "<cmd>lua vim.lsp.buf.declaration()<cr>", {noremap = true, silent = true})
+    vim.fn.nvim_buf_set_keymap(0, "n", "<leader>gd", "<cmd>lua vim.lsp.buf.definition()<cr>", {noremap = true, silent = true})
+    vim.fn.nvim_buf_set_keymap(0, "n", "<leader>h", "<cmd>lua vim.lsp.buf.hover()<cr>", {noremap = true, silent = true})
+    vim.fn.nvim_buf_set_keymap(0, "n", "<leader>gy", "<cmd>lua vim.lsp.buf.implementation()<cr>", {noremap = true, silent = true})
+    vim.fn.nvim_buf_set_keymap(0, "n", "<leader>s", "<cmd>lua vim.lsp.buf.signature_help()<cr>", {noremap = true, silent = true})
+    vim.fn.nvim_buf_set_keymap(0, "n", "<leader>gt", "<cmd>lua vim.lsp.buf.type_definition()<cr>", {noremap = true, silent = true})
+    vim.fn.nvim_buf_set_keymap(0, "n", "<leader>r", "<cmd>lua vim.lsp.buf.references()<cr>", {noremap = true, silent = true})
     vim.fn.nvim_buf_set_keymap(0, "n", "<leader>@", "<cmd>lua vim.lsp.buf.document_symbol()<cr>", {noremap = true, silent = true})
     vim.fn.nvim_buf_set_keymap(0, "n", "<leader>W", "<cmd>lua vim.lsp.buf.workspace_symbol()<cr>", {noremap = true, silent = true})
     vim.fn.nvim_buf_set_keymap(0, "n", "<leader>ca", "<cmd>lua vim.lsp.buf.code_action()<cr>", {noremap = true, silent = true})
@@ -87,6 +88,36 @@ nvim_lsp.clojure_lsp.setup{
         },
         ["dependency-scheme"] = { "jar" }
     },
+    on_attach = custom_attach,
+    capabilities = status.capabilities
+}
+
+local install_dir = function(server_name)
+    return require'nvim_lsp/configs'[server_name].install_info().install_dir
+end
+
+nvim_lsp.jdtls.setup{
+    cmd = {
+        "java",
+        "--add-modules=ALL-SYSTEM",
+        "--add-opens", "java.base/java.util=ALL-UNNAMED",
+        "--add-opens", "java.base/java.lang=ALL-UNNAMED",
+        "-Declipse.application=org.eclipse.jdt.ls.core.id1",
+        "-Dosgi.bundles.defaultStartLevel=4",
+        "-Declipse.product=org.eclipse.jdt.ls.core.product",
+        "-Dlog.protocol=true",
+        "-Dlog.level=ALL",
+        -- "-noverify",
+        "-Xms100m",
+        "-Xmx1G",
+        "-jar",
+        install_dir("jdtls").."\\plugins\\org.eclipse.equinox.launcher_1.6.0.v20200915-1508.jar",
+        "-configuration",
+        install_dir("jdtls").."\\config_win",
+        "-data",
+        "C:\\Users\\tpalka\\.jdtls" },
+    filetypes = { "java" },
+    root_dir = root_pattern(".project", ".classpath", "pom.xml", ".git"),
     on_attach = custom_attach,
     capabilities = status.capabilities
 }
