@@ -49,12 +49,20 @@ highlight! GitGutterChangeDelete guifg=Red guibg=White gui=reverse,bold
 highlight! GitGutterDelete guifg=Red guibg=White gui=reverse,bold
 
 " Lsp highlights
-let s:bg_color = {
+let s:sign_bg_color = {
       \ "light": "#eee8d5",
       \ "dark": "#073642"
       \}
-execute "highlight! LspReferenceRead guifg=Green guibg="..s:bg_color[&background]
-execute "highlight! LspReferenceText guifg=Blue guibg="..s:bg_color[&background]
-execute "highlight! LspReferenceWrite guifg=Red guibg="..s:bg_color[&background]
+" References
+execute "highlight! LspReferenceRead guifg=#00cc00 guibg="..s:sign_bg_color[&background]
+execute "highlight! LspReferenceText guifg=#6666ff guibg="..s:sign_bg_color[&background]
+execute "highlight! LspReferenceWrite guifg=#ff6666 guibg="..s:sign_bg_color[&background]
+" Diagnostics
+execute "highlight! LspDiagnosticsError guifg=#ff9999"
+execute "highlight! LspDiagnosticsErrorSign guifg=Red"
+sign define LspDiagnosticsErrorSign texthl=LspDiagnosticsErrorSign
+execute "highlight! LspDiagnosticsWarning guifg=#ffcc99"
+execute "highlight! LspDiagnosticsWarningSign guifg=Orange"
+sign define LspDiagnosticsWarningSign texthl=LspDiagnosticsWarningSign
 
 let g:colors_name = "MyNeoSolarized"
