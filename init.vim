@@ -155,7 +155,7 @@ Plug 'neovim/nvim-lspconfig'
 Plug 'nvim-lua/diagnostic-nvim'
 let g:diagnostic_enable_virtual_text = 1
 let g:space_before_virtual_text = 5
-let g:diagnostic_enable_underline = 0
+let g:diagnostic_enable_underline = 1
 let g:diagnostic_insert_delay = 1
 call sign_define("LspDiagnosticsErrorSign", {"text": "E", "texthl": "LspDiagnosticsError"})
 call sign_define("LspDiagnosticsWarningSign", {"text": "W", "texthl": "LspDiagnosticsWarning"})

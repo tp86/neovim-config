@@ -61,8 +61,10 @@ execute "highlight! LspReferenceWrite guifg=#ff6666 guibg="..s:sign_bg_color[&ba
 execute "highlight! LspDiagnosticsError guifg=#ff9999"
 execute "highlight! LspDiagnosticsErrorSign guifg=Red"
 sign define LspDiagnosticsErrorSign texthl=LspDiagnosticsErrorSign
+highlight LspDiagnosticsUnderlineError gui=underline guifg=Red
 execute "highlight! LspDiagnosticsWarning guifg=#ffcc99"
 execute "highlight! LspDiagnosticsWarningSign guifg=Orange"
 sign define LspDiagnosticsWarningSign texthl=LspDiagnosticsWarningSign
+highlight LspDiagnosticsUnderlineWarning gui=underline guifg=Orange
 
 let g:colors_name = "MyNeoSolarized"
