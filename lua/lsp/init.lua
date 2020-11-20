@@ -25,22 +25,22 @@ local custom_attach = function(client)
 
     vim.fn.LspBufCommands()
     -- ShowDiagnostic command is defined in init.vim
-    vim.fn.nvim_buf_set_keymap(0, "n", "<leader>d?", "<cmd>ShowDiagnostic<cr>", {noremap = true, silent = true})
-    vim.fn.nvim_buf_set_keymap(0, "n", "<leader>D", "<cmd>PrevDiagnostic<cr>", {noremap = true, silent = true})
-    vim.fn.nvim_buf_set_keymap(0, "n", "<leader>d", "<cmd>NextDiagnostic<cr>", {noremap = true, silent = true})
+    vim.fn.nvim_buf_set_keymap(0, "n", "<c-l>?", "<cmd>ShowDiagnostic<cr>", {noremap = true, silent = true})
+    vim.fn.nvim_buf_set_keymap(0, "n", "<c-l>D", "<cmd>PrevDiagnostic<cr>", {noremap = true, silent = true})
+    vim.fn.nvim_buf_set_keymap(0, "n", "<c-l>d", "<cmd>NextDiagnostic<cr>", {noremap = true, silent = true})
 
-    vim.fn.nvim_buf_set_keymap(0, "n", "<leader>gD", "<cmd>lua vim.lsp.buf.declaration()<cr>", {noremap = true, silent = true})
-    vim.fn.nvim_buf_set_keymap(0, "n", "<leader>gd", "<cmd>lua vim.lsp.buf.definition()<cr>", {noremap = true, silent = true})
-    vim.fn.nvim_buf_set_keymap(0, "n", "<leader>h", "<cmd>lua vim.lsp.buf.hover()<cr>", {noremap = true, silent = true})
-    vim.fn.nvim_buf_set_keymap(0, "n", "<leader>gy", "<cmd>lua vim.lsp.buf.implementation()<cr>", {noremap = true, silent = true})
-    vim.fn.nvim_buf_set_keymap(0, "n", "<leader>s", "<cmd>lua vim.lsp.buf.signature_help()<cr>", {noremap = true, silent = true})
-    vim.fn.nvim_buf_set_keymap(0, "n", "<leader>gt", "<cmd>lua vim.lsp.buf.type_definition()<cr>", {noremap = true, silent = true})
-    vim.fn.nvim_buf_set_keymap(0, "n", "<leader>r", "<cmd>lua vim.lsp.buf.references()<cr>", {noremap = true, silent = true})
-    vim.fn.nvim_buf_set_keymap(0, "n", "<leader>@", "<cmd>lua vim.lsp.buf.document_symbol()<cr>", {noremap = true, silent = true})
-    vim.fn.nvim_buf_set_keymap(0, "n", "<leader>W", "<cmd>lua vim.lsp.buf.workspace_symbol()<cr>", {noremap = true, silent = true})
-    vim.fn.nvim_buf_set_keymap(0, "n", "<leader>ca", "<cmd>lua vim.lsp.buf.code_action()<cr>", {noremap = true, silent = true})
-    vim.fn.nvim_buf_set_keymap(0, "n", "<leader><f2>", "<cmd>lua vim.lsp.buf.rename()<cr>", {noremap = true, silent = true})
-    vim.fn.nvim_buf_set_keymap(0, "n", "<leader>=", "<cmd>lua vim.lsp.buf.formatting()<cr>", {noremap = true, silent = true})
+    vim.fn.nvim_buf_set_keymap(0, "n", "<c-l>gD", "<cmd>lua vim.lsp.buf.declaration()<cr>", {noremap = true, silent = true})
+    vim.fn.nvim_buf_set_keymap(0, "n", "<c-l>gd", "<cmd>lua vim.lsp.buf.definition()<cr>", {noremap = true, silent = true})
+    vim.fn.nvim_buf_set_keymap(0, "n", "<c-l>h", "<cmd>lua vim.lsp.buf.hover()<cr>", {noremap = true, silent = true})
+    vim.fn.nvim_buf_set_keymap(0, "n", "<c-l>gy", "<cmd>lua vim.lsp.buf.implementation()<cr>", {noremap = true, silent = true})
+    vim.fn.nvim_buf_set_keymap(0, "n", "<c-l>s", "<cmd>lua vim.lsp.buf.signature_help()<cr>", {noremap = true, silent = true})
+    vim.fn.nvim_buf_set_keymap(0, "n", "<c-l>gt", "<cmd>lua vim.lsp.buf.type_definition()<cr>", {noremap = true, silent = true})
+    vim.fn.nvim_buf_set_keymap(0, "n", "<c-l>r", "<cmd>lua vim.lsp.buf.references()<cr>", {noremap = true, silent = true})
+    vim.fn.nvim_buf_set_keymap(0, "n", "<c-l>@", "<cmd>lua vim.lsp.buf.document_symbol()<cr>", {noremap = true, silent = true})
+    vim.fn.nvim_buf_set_keymap(0, "n", "<c-l>W", "<cmd>lua vim.lsp.buf.workspace_symbol()<cr>", {noremap = true, silent = true})
+    vim.fn.nvim_buf_set_keymap(0, "n", "<c-l>a", "<cmd>lua vim.lsp.buf.code_action()<cr>", {noremap = true, silent = true})
+    vim.fn.nvim_buf_set_keymap(0, "n", "<c-l>n", "<cmd>lua vim.lsp.buf.rename()<cr>", {noremap = true, silent = true})
+    vim.fn.nvim_buf_set_keymap(0, "n", "<c-l>=", "<cmd>lua vim.lsp.buf.formatting()<cr>", {noremap = true, silent = true})
 
     vim.api.nvim_command [[autocmd CursorHold  <buffer> lua vim.lsp.buf.clear_references();vim.lsp.buf.document_highlight()]]
     vim.api.nvim_command [[autocmd CursorHoldI <buffer> lua vim.lsp.buf.clear_references();vim.lsp.buf.document_highlight()]]
@@ -121,3 +121,14 @@ nvim_lsp.jdtls.setup{
     on_attach = custom_attach,
     capabilities = status.capabilities
 }
+
+-- nvim_lsp.yamlls.setup{
+--     cmd = {
+--         install_dir("yamlls").."\\bin\\yaml-language-server",
+--         "--stdio"
+--     },
+--     filetypes = { "yaml" },
+--     root_dir = root_pattern(".git", vim.fn.getcwd()),
+--     on_attach = custom_attach,
+--     capabilities = status.capabilities
+-- }

@@ -42,28 +42,28 @@ highlight! LspDiagnosticsHint guifg=LightGrey
 highlight! link LspDiagnosticsHintSign LspDiagnosticsHint
 highlight! link LspDiagnosticsHintFloating LspDiagnosticsHint
 
-" GitGutter signs customization
-highlight! GitGutterAdd guifg=Green guibg=White gui=reverse,bold
-highlight! GitGutterChange guifg=Orange guibg=White gui=reverse,bold
-highlight! GitGutterChangeDelete guifg=Red guibg=White gui=reverse,bold
-highlight! GitGutterDelete guifg=Red guibg=White gui=reverse,bold
-
-" Lsp highlights
 let s:sign_bg_color = {
       \ "light": "#eee8d5",
       \ "dark": "#073642"
       \}
+" GitGutter signs customization
+execute "highlight! GitGutterAdd guifg=Green gui=bold guibg="..s:sign_bg_color[&background]
+execute "highlight! GitGutterChange guifg=Orange gui=bold guibg="..s:sign_bg_color[&background]
+execute "highlight! GitGutterChangeDelete guifg=Red gui=bold guibg="..s:sign_bg_color[&background]
+execute "highlight! GitGutterDelete guifg=Red gui=bold guibg="..s:sign_bg_color[&background]
+
+" Lsp highlights
 " References
 execute "highlight! LspReferenceRead guifg=#00cc00 guibg="..s:sign_bg_color[&background]
 execute "highlight! LspReferenceText guifg=#6666ff guibg="..s:sign_bg_color[&background]
 execute "highlight! LspReferenceWrite guifg=#ff6666 guibg="..s:sign_bg_color[&background]
 " Diagnostics
-execute "highlight! LspDiagnosticsError guifg=#ff9999"
-execute "highlight! LspDiagnosticsErrorSign guifg=Red"
+highlight! LspDiagnosticsError guifg=#ff9999
+highlight! LspDiagnosticsErrorSign guibg=White guifg=Red gui=reverse,bold
 sign define LspDiagnosticsErrorSign texthl=LspDiagnosticsErrorSign
 highlight LspDiagnosticsUnderlineError gui=underline guifg=Red
-execute "highlight! LspDiagnosticsWarning guifg=#ffcc99"
-execute "highlight! LspDiagnosticsWarningSign guifg=Orange"
+highlight! LspDiagnosticsWarning guifg=#ffcc99
+highlight! LspDiagnosticsWarningSign guibg=White guifg=Orange gui=reverse,bold
 sign define LspDiagnosticsWarningSign texthl=LspDiagnosticsWarningSign
 highlight LspDiagnosticsUnderlineWarning gui=underline guifg=Orange
 

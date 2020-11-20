@@ -107,6 +107,13 @@ let g:fzf_action = {
       \ "ctrl-s": "split",
       \ "ctrl-v": "vsplit",
       \}
+let g:fzf_colors = {
+      \ "fg": ["fg", "Normal"],
+      \ "fg+": ["fg", "ErrorMsg"],
+      \ "bg+": ["bg", "Normal"],
+      \ "hl": ["fg", "Directory"],
+      \ "hl+": ["fg", "Directory"],
+      \}
 Plug 'junegunn/fzf.vim'
 
 " explorer {{{3
@@ -134,6 +141,7 @@ function! ApplyPatch(patch)
 endfunction
 Plug 'nvim-lua/completion-nvim', { 'do': ':call ApplyPatch(\"completion.patch\")' }
 set completeopt=menuone,noinsert,noselect
+set noequalalways
 augroup completion_nvim_every_buffer
   autocmd!
   autocmd BufEnter * lua require'completion'.on_attach()
@@ -507,7 +515,7 @@ function! LspBufCommands()
   endfunction
   command! -buffer LspReload call <sid>lsp_reload_client()
   command! -buffer LspCodeAction lua vim.lsp.buf.code_action()
-  command! -buffer ShowDiagnostic lua vim.lsp.util.show_line_diagnostics()
+  command! -buffer LspShowDiagnostic lua vim.lsp.util.show_line_diagnostics()
   command! -buffer LspIncomingCalls lua vim.lsp.buf.incoming_calls()
   command! -buffer LspOutgoingCalls lua vim.lsp.buf.outgoing_calls()
 endfunction
