@@ -35,7 +35,7 @@ augroup quickfix_window
 augroup end
 
 "" statusline
-" TODO
+set statusline=%!statusline#active()
 "" tabline
 " TODO
 
