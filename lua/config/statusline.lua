@@ -1,3 +1,28 @@
+vim.fn = vim.fn or setmetatable({}, {
+    __index = function(t, func)
+        return function(...)
+            return vim.api.nvim_call_function(func, {...})
+        end
+    end
+})
+
+local function build(parts)
+    local stl = ''
+    for _, part in ipairs(parts) do
+        local part_type = type(part)
+        local part_result
+        if part_type == 'function' then
+            part_result = part()
+        elseif part_type == 'string' or part_type == 'number' then
+            part_result = part
+        else
+            part_result = ''
+        end
+        stl = stl .. part_result
+    end
+    return stl
+end
+
 local stl_module = {}
 
 local parts = {
@@ -32,14 +57,16 @@ local parts_highlighted = {
 }
 
 local filetype_stl = {
-    help = parts_highlighted.filename
+    help = {parts_highlighted.filename}
 }
 
 function stl_module.active()
-    local default_stl = parts_highlighted.cwd()..parts_highlighted.filename()
+    local default_stl = {
+        parts_highlighted.cwd,
+        parts_highlighted.filename
+    }
     local filetype = vim.fn.nvim_buf_get_option(0, 'filetype')
-    local stl_func = filetype_stl[filetype] or function() return default_stl end
-    return stl_func()
+    return build(filetype_stl[filetype] or default_stl)
 end
 
 return stl_module
