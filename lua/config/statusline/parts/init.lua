@@ -9,6 +9,12 @@ local function get_path_sep()
 end
 local path_sep = get_path_sep()
 
+local function check_empty_bufname(bufname)
+    if bufname == '' then
+        return ' [No Name]'
+    end
+end
+
 return {
     cwd = function()
         local full_cwd_path = full_cwd_path()
@@ -19,27 +25,28 @@ return {
         return vim.fn.pathshorten(full_cwd_path)..path_sep
     end,
     filename = function()
-        return vim.fn.fnamemodify(vim.fn.bufname(), ':t')
+        local bufname = vim.fn.bufname()
+        return check_empty_bufname(bufname) or vim.fn.fnamemodify(bufname, ':t')
     end,
     relative_filename = function()
         local bufname = vim.fn.bufname()
-        if string.len(bufname) == 0 then
-            return ''
+        local body = function()
+            local full_bufname = vim.fn.fnamemodify(bufname, ':p')
+            local full_cwd_path = full_cwd_path()
+            full_cwd_path = vim.fn.escape(full_cwd_path, '\\%')
+            local relative_path = vim.fn.matchstr(full_bufname, '\\v'..full_cwd_path..'\\zs.*$')
+            if string.len(relative_path) == 0 then
+                relative_path = full_bufname
+            end
+            local relative_dir = vim.fn.fnamemodify(relative_path, ':h')
+            local filename = vim.fn.fnamemodify(bufname, ':t')
+            if relative_dir == '.' then
+                return filename
+            else
+                relative_dir = vim.fn.pathshorten(relative_dir)
+                return table.concat({relative_dir, filename}, path_sep)
+            end
         end
-        local full_bufname = vim.fn.fnamemodify(bufname, ':p')
-        local full_cwd_path = full_cwd_path()
-        full_cwd_path = vim.fn.escape(full_cwd_path, '\\%')
-        local relative_path = vim.fn.matchstr(full_bufname, '\\v'..full_cwd_path..'\\zs.*$')
-        if string.len(relative_path) == 0 then
-            relative_path = full_bufname
-        end
-        local relative_dir = vim.fn.fnamemodify(relative_path, ':h')
-        local filename = vim.fn.fnamemodify(bufname, ':t')
-        if relative_dir == '.' then
-            return filename
-        else
-            relative_dir = vim.fn.pathshorten(relative_dir)
-            return table.concat({relative_dir, filename}, path_sep)
-        end
+        return check_empty_bufname(bufname) or body()
     end,
 }
