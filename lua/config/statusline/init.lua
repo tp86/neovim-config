@@ -23,7 +23,7 @@ local filetype_stl = {
 
 local default_stl = {
     parts.cwd,
-    parts.filename
+    parts.relative_filename
 }
 
 return {
