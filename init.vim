@@ -1,3 +1,14 @@
+" Fix Lua when using Neovim version < 0.5.0
+lua << EOF
+vim.fn = vim.fn or setmetatable({}, {
+    __index = function(t, func)
+        return function(...)
+            return vim.api.nvim_call_function(func, {...})
+        end
+    end
+})
+EOF
+
 let mapleader = " "
 
 set hidden
