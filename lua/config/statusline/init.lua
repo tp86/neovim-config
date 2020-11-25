@@ -14,17 +14,10 @@ end
 local function build(parts)
     local stl = ''
     for _, part in ipairs(parts) do
-        local part_result = get_string(part)
-        stl = stl .. part_result
+        stl = stl .. get_string(part)
     end
     return stl
 end
-
-local filetype_stl = {
-    help = {
-        parts.filename
-    },
-}
 
 local function str_split(str, pattern)
     local splitted = {}
@@ -33,6 +26,12 @@ local function str_split(str, pattern)
     end
     return splitted
 end
+
+local filetype_stl = {
+    help = {
+        parts.filename
+    },
+}
 
 local bufname_patterns_stl = {
     ['^term://'] = {
@@ -47,9 +46,8 @@ local bufname_patterns_stl = {
 }
 
 local function match(patterns_table, str_to_match)
-    for pattern, value in ipairs(patterns_table) do
+    for pattern, value in pairs(patterns_table) do
         if string.match(str_to_match, pattern) then
-            print('matched '..str_to_match..' to '..pattern)
             return get_string(value, str_to_match)
         end
     end
