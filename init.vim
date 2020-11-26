@@ -9,6 +9,12 @@ vim.fn = vim.fn or setmetatable({}, {
 })
 EOF
 
+" Helper for reloading Lua packages
+function! s:lua_package_complete(...)
+  return join(luaeval('vim.tbl_keys(package.loaded)'), "\n")
+endfunction
+command! -nargs=1 -complete=custom,s:lua_package_complete LuaReload lua package.loaded[<q-args>] = nil
+
 let mapleader = " "
 
 set hidden
@@ -46,7 +52,16 @@ augroup quickfix_window
 augroup end
 
 "" statusline
-"set statusline=%!statusline#active()
+lua << EOF
+local s = require'satiable'
+s.parts = {
+  filename = [[
+    return vim.fn.fnamemodify(vim.fn.bufname(), ':t')
+  ]],
+  sep = '-',
+}
+EOF
+set statusline=%!luaeval('require\''satiable\''.statusline()')
 "" tabline
 " TODO
 

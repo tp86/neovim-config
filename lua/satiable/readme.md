@@ -59,8 +59,8 @@ require'satiable'.statusline = {
 ```
 
 ```vim
-set statusline=%!satiable#statusline()
-set tabline=%!satiable#tabline()
+set statusline=%!luaeval('require\''satiable\''.statusline()')
+set tabline=%!luaeval('require\''satiable\''.tabline()')
 ```
 
 # Roadmap
