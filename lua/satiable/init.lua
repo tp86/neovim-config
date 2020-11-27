@@ -26,8 +26,6 @@ local function build(parts)
         if loadstring(part) then
             local processed_part = trim(string.gsub(part, '\n', ' '))
             processed_part = escape(processed_part, '\'"', 2)
-            --processed_part = string.gsub(processed_part, "'", "\\\\'")
-            --processed_part = string.gsub(processed_part, '"', '\\\\"')
             table.insert(result, '%{luaeval("loadstring(\''..processed_part..'\')()")}')
         else
             table.insert(result, part)
