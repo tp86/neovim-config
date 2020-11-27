@@ -1,5 +1,6 @@
-" Fix Lua when using Neovim version < 0.5.0
+" Lua fixes for different Neovim versions
 lua << EOF
+-- emulate vim.fn for Neovim version < 0.5.0
 vim.fn = vim.fn or setmetatable({}, {
     __index = function(t, func)
         return function(...)
@@ -7,6 +8,8 @@ vim.fn = vim.fn or setmetatable({}, {
         end
     end
 })
+-- loadstring deprecated since Lua 5.2
+loadstring = loadstring or load
 EOF
 
 " Helper for reloading Lua packages
