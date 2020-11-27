@@ -1,15 +1,24 @@
-" Lua fixes for different Neovim versions
+" Lua fixes for different Lua versions in Neovim and different lua vim packages
+" In Termux, Neovim 0.4.4 has Lua 5.3 instead of LuaJIT 2.1.0
 lua << EOF
 -- emulate vim.fn for Neovim version < 0.5.0
 vim.fn = vim.fn or setmetatable({}, {
-    __index = function(t, func)
+    __index = function(_, f)
         return function(...)
-            return vim.api.nvim_call_function(func, {...})
+            return vim.api.nvim_call_function(f, {...})
         end
     end
 })
 -- loadstring deprecated since Lua 5.2
 loadstring = loadstring or load
+-- tbl_keys emulation
+vim.tbl_keys = vim.tbl_keys or function(t)
+    local keys = {}
+    for k in pairs(t) do
+        table.insert(keys, k)
+    end
+    return keys
+end
 EOF
 
 " Helper for reloading Lua packages

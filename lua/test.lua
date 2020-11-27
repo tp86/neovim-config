@@ -1,15 +1,38 @@
 local cache = require"cacher"
 
-local source = {
-    a = function()
-        print("called a")
-        return 5
+local components = {}
+
+local function transform_set(tbl, transformer)
+    return function(_, k, v)
+        if transformer then
+            v = transformer(v)
+        end
+        rawset(tbl, k, v)
     end
+end
+
+local function table_w_transform_r_cache(tbl)
+    return {
+        __newindex = transform_set(tbl),
+        __index = cache(tbl),
+    }
+end
+
+local m = {
+    components = setmetatable({}, table_w_transform_r_cache(components))
 }
 
-local cached = cache(source)
+m.components.a = function()
+    print("called a")
+    return 5
+end
 
-print(cached.a)
-print(cached.a)
-print(cached.a)
-print(cached.a)
+m.components.b = function()
+    print("called b")
+    return m.components.a + 3
+end
+
+
+print(m.components.b)
+print(m.components.b)
+print(m.components.a)
