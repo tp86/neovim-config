@@ -3,10 +3,6 @@ local defaults = {
     statusline = {},
 }
 
-local components = setmetatable({}, {
-    __index = defaults.components
-})
-
 local function transform_set(tbl, transformer)
     return function(_, k, v)
         if transformer then
@@ -31,28 +27,34 @@ local function cache(tbl)
     })
 end
 
-local function table_w_transform_r_cache(tbl)
-    return {
-        __newindex = transform_set(tbl),
-        __index = cache(tbl),
-    }
+local function new_components()
+    local components = setmetatable({}, {
+        __index = defaults.components
+    })
+    return setmetatable({}, {
+        __newindex = transform_set(components),
+        __index = cache(components),
+        __metatable = nil
+    })
 end
 
-local m_components = setmetatable({}, table_w_transform_r_cache(components))
+local components = new_components()
 
 local m = setmetatable({}, {
     __index = function(_, k)
         if k == "components" then
-            return m_components
+            return components
         end
     end,
     __newindex = function(_, k, v)
         if k == "components" then
+            components = new_components()
             for ck, cv in pairs(v) do
-                m_components[ck] = cv
+                components[ck] = cv
             end
         end
     end,
+    __metatable = nil
 })
 
 defaults.components.bufname = function()
@@ -78,6 +80,10 @@ m.components = {
 
 
 print(m.components.b)
+print(m.components.a)
+m.components = {
+    b = 3
+}
 print(m.components.b)
 print(m.components.a)
 print(m.components.bufname)
