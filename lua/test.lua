@@ -57,7 +57,7 @@ local function new_statusline()
                     -- TODO actual rendering function
                     print('rendering statusline number '..i)
                     print(vim.inspect(v))
-                    break
+                    return v[#v]
                 end
             end
         end,
@@ -164,3 +164,4 @@ m.statusline = {
 }
 
 m.statusline()
+return m
