@@ -67,10 +67,43 @@ augroup end
 lua << EOF
 local s = require'satiable'
 s.parts = {
-  filename = [[
-    return vim.fn.fnamemodify(vim.fn.bufname(), ':t')
-  ]],
-  sep = '-',
+  truncate = '%<',
+  file = '%f',
+  space = ' ',
+  help_buffer = '%h',
+  modified = '%m',
+  read_only = '%r',
+  alignment_separator = '%=',
+  group_begin = '%-14.(',
+  -- TODO in statusline:
+  -- {
+  --    format = '-14.',
+  --    s.parts.group_begin
+  -- }
+  group_end = '%)',
+  line = '%l',
+  comma = ',',
+  column = '%c',
+  virtual_column = '%V',
+  percentage = '%p',
+  percent = '%%',
+}
+s.statusline = {
+  s.parts.truncate,
+  s.parts.file,
+  s.parts.space,
+  s.parts.help_buffer,
+  s.parts.modified,
+  s.parts.read_only,
+  s.parts.alignment_separator,
+  s.parts.group_begin,
+  s.parts.line,
+  s.parts.comma,
+  s.parts.column,
+  s.parts.virtual_column,
+  s.parts.group_end,
+  s.parts.percentage,
+  s.parts.percent,
 }
 EOF
 set statusline=%!luaeval('require\''satiable\''.statusline()')
