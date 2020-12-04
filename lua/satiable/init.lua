@@ -73,44 +73,47 @@ local function new_statusline()
         end,
         __call = function(_)
             cached_parts = cache(parts)
-            return table.concat(statusline_built, '')
+            local statusline = table.concat(statusline_built, '')
+            return statusline
         end
     })
 end
 local statusline = new_statusline()
 
 local m = {
-    getter = {
-        parts = function()
+    parts = {
+        getter = function()
             return cached_parts
         end,
-        statusline = function()
-            return statusline
-        end,
-    },
-    setter = {
-        parts = function(new_value)
+        setter = function(new_value)
             parts = new_parts()
             cached_parts = cache(parts)
             for key, value in pairs(new_value) do
                 parts[key] = value
             end
         end,
-        statusline = function(new_value)
+    },
+    statusline = {
+        getter = function()
+            return statusline
+        end,
+        setter = function(new_value)
             statusline = new_statusline()
             for i, value in ipairs(new_value) do
                 statusline[i] = value
             end
         end
-    }
+    },
 }
 local m_meta = {
     __index = function(_, field)
-        local field_getter = m.getter[field]
-        if field_getter then return field_getter() end
+        local field_getter = m[field].getter
+        if field_getter then
+            return field_getter()
+        end
     end,
     __newindex = function(_, field, value)
-        local field_setter = m.setter[field]
+        local field_setter = m[field].setter
         if field_setter then return field_setter(value) end
     end,
     __metatable = nil
