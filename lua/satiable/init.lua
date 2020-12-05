@@ -22,10 +22,9 @@ local parts_meta = {
     end
 }
 local cached_parts = {}
-local cached_parts_names = {}
+local cached_parts_names = setmetatable({}, {__mode = 'k'})
 local cache = function(tbl)
     local cache_table = {}
-    cached_parts_names = {}
     local cache_meta = {
         __index = function(t, key)
             local value = tbl[key]
@@ -51,7 +50,7 @@ local function new_parts()
     return parts
 end
 local parts = new_parts()
-local statusline_built = {}
+--local statusline_built = {}
 local function build_statusline_part(part_name)
     -- TODO multiple statuslines (with defaults as last)
     -- TODO strings in statusline
@@ -66,14 +65,20 @@ local function build_statusline_part(part_name)
     return cached_parts[part_name]
 end
 local function new_statusline()
-    return setmetatable({}, {
+    local statusline = {}
+    return setmetatable(statusline, {
         __newindex = function(t, k, v)
-            rawset(statusline_built, k, build_statusline_part(cached_parts_names[v]))
+            --rawset(statusline_built, k, build_statusline_part(cached_parts_names[v]))
             rawset(t, k, v)
         end,
-        __call = function(_)
+        __call = function(t)
             cached_parts = cache(parts)
+            local statusline_built = {}
+            for _, statusline_part in ipairs(t) do
+                table.insert(statusline_built, build_statusline_part(cached_parts_names[statusline_part]))
+            end
             local statusline = table.concat(statusline_built, '')
+            collectgarbage()
             return statusline
         end
     })
@@ -104,6 +109,11 @@ local m = {
             end
         end
     },
+    cached_parts_names = {
+        getter = function()
+            return cached_parts_names
+        end
+    }
 }
 local m_meta = {
     __index = function(_, field)

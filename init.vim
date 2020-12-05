@@ -27,6 +27,8 @@ function! s:lua_package_complete(...)
 endfunction
 command! -nargs=1 -complete=custom,s:lua_package_complete LuaReload lua package.loaded[<q-args>] = nil
 
+language en_US
+
 let mapleader = " "
 
 set hidden
@@ -119,7 +121,7 @@ s.statusline = {
   s.parts.group_end,
   s.parts.percentage,
   s.parts.percent,
-  s.parts.time_end,
+  --s.parts.time_end,
 }
 EOF
 set statusline=%!luaeval('require\''satiable\''.statusline()')
