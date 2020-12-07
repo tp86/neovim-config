@@ -19,6 +19,14 @@ vim.tbl_keys = vim.tbl_keys or function(t)
     end
     return keys
 end
+-- tbl_count emulation
+vim.tbl_count = vim.tbl_count or function(tbl)
+    local count = 0
+    for _ in pairs(tbl) do
+        count = count + 1
+    end
+    return count
+end
 EOF
 
 " Helper for reloading Lua packages
@@ -27,7 +35,7 @@ function! s:lua_package_complete(...)
 endfunction
 command! -nargs=1 -complete=custom,s:lua_package_complete LuaReload lua package.loaded[<q-args>] = nil
 
-language en_US
+language en_US.UTF-8
 
 let mapleader = " "
 
