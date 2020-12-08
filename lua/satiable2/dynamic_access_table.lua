@@ -1,16 +1,15 @@
-local function dynamic_access_table(tbl)
+local function dynamic_access_table(tbl, access_tbl)
     local dynamic_access_table_meta = {
         __index = function(_, field)
-            local getter = tbl[field].get
-            if getter then return getter() end
+            local index_func = access_tbl[field].index
+            if index_func then return index_func() end
         end,
         __newindex = function(_, field, value)
-            local setter = tbl[field].set
-            if setter then return setter(value) end
-        end,
-        __metatable = {}
+            local newindex_func = access_tbl[field].newindex
+            if newindex_func then return newindex_func(value) end
+        end
     }
-    return setmetatable({}, dynamic_access_table_meta)
+    return setmetatable(tbl, dynamic_access_table_meta)
 end
 
 return dynamic_access_table
