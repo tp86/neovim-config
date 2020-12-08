@@ -85,9 +85,6 @@ satiable.statusline = {
 --  #satiable.statusline or `[i]pairs(satiable.statusline)` won't work here (requires Lua 5.2)
 assert (require'satiable2.utils'.len(satiable.statusline) == 2,
         'assigning new table of tables to `satiable.statusline` overwrites previous assignments')
-for i, v in require'satiable2.utils'.ipairs(satiable.statusline) do
-    print(i, v)
-end
 
 --  `satiable.statusline` can be called
 assert (pcall(satiable.statusline),
