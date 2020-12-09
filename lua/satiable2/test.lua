@@ -145,7 +145,18 @@ end
 
 function TestItemsStructure:test_items_table_has_default_items()
     self.satiable.statusline.items = {}
-    lu.assert_not_nil(self.items.file_path, 'items should have default `file_path`')
+    local vim_builtins = {
+        'file_path', 'full_file_path', 'file_name', 'modified_brackets', 'modified_comma',
+        'readonly_brackets', 'readonly_comma', 'help_brackets', 'help_comma', 'preview_brackets',
+        'preview_comma', 'filetype_brackets', 'filetype_comma', 'qf_loc_list', 'keymap',
+        'buffer_number', 'cursor_char', 'cursor_char_hex', 'cursor_offset', 'cursor_offset_hex',
+        'line_number', 'line_count', 'column_number', 'virtual_column_number', 'virtual_column_number_alt',
+        'percentage_lines', 'percentage_view', 'args', 'truncate', 'align_separator',
+        'percent_sign'
+    }
+    for _, item in ipairs(vim_builtins) do
+        lu.assert_not_nil(self.items[item], 'items should have default `'..item..'` from builtin items')
+    end
 end
 
 

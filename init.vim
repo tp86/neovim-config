@@ -183,6 +183,10 @@ inoremap <c-k> <c-p>
 noremap H ^
 noremap L $
 nnoremap <backspace> <c-^>
+augroup help_maps
+  autocmd!
+  autocmd FileType help nnoremap <buffer> <cr> <c-]>
+augroup end
 
 " editing & formatting
 set clipboard+=unnamed  " win32yank / xclip installation may be needed
