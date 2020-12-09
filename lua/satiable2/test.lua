@@ -22,8 +22,28 @@ function TestStatusline:test_statusline_is_a_table()
     lu.assert_is_table(self.statusline, 'statusline should be a table')
 end
 
-function TestStatusline:test_statusline_is_callable()
+TestStatuslineCall = {}
+function TestStatuslineCall:setUp()
+    local satiable = module_cleanup('satiable2')
+    self.statusline = satiable.statusline
+end
+
+function TestStatuslineCall:test_statusline_is_callable()
     lu.assert_true(pcall(self.statusline), 'statusline should be callable')
+end
+
+function TestStatuslineCall:test_returns_rendered_statusline_string_based_on_table()
+    local items = self.statusline.items
+    items.a = function()
+        return 'a'
+    end
+    self.statusline[1] = {
+        items.a,
+        ' ',
+        'b',
+    }
+    lu.assert_equals(self.statusline(), [[%{luaeval("require'satiable'.statusline.items.a()")} b]],
+        'statusline call should return rendered statusline string')
 end
 
 TestStatuslineStructure = {}
@@ -115,6 +135,19 @@ function TestItems:test_define_multiple_functions_together()
     lu.assert_true(called.c, 'function in items should be called')
     lu.assert_true(called.a, 'dependent function in items should be called')
 end
+
+TestItemsStructure = {}
+function TestItemsStructure:setUp()
+    local satiable = module_cleanup('satiable2')
+    self.satiable = satiable
+    self.items = satiable.statusline.items
+end
+
+function TestItemsStructure:test_items_table_has_default_items()
+    self.satiable.statusline.items = {}
+    lu.assert_not_nil(self.items.file_path, 'items should have default `file_path`')
+end
+
 
 lu.LuaUnit.run()
 

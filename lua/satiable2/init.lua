@@ -2,8 +2,44 @@ local dynamic_access_table = require'satiable2.dynamic_access_table'
 local tbl_clear = require'satiable2.utils'.tbl_clear
 local update_meta = require'satiable2.utils'.update_meta
 
-local items = {}
+local defaults = {
+    items = {
+        file_path = '%f',
+        full_file_path = '%F',
+        file_name = '%t',
+        modified_brackets = '%m',
+        modified_comma = '%M',
+        readonly_brackets = '%r',
+        readonly_comma = '%R',
+    }
+}
+local items_defaults_meta = {
+    __index = defaults.items
+}
+
+local items = setmetatable({}, items_defaults_meta)
 local statusline = {}
+
+local function add_stl_tbl(index, value)
+    -- allow adding number-indexed tables (only) to statusline
+    if type(value) == 'table' then
+        statusline[index] = value
+        return
+    end
+    error('statusline configuration must be a table')
+end
+local number_index_dat = function(index)
+    return {
+        -- should have newindex field returning function accepting one argument - new value
+        -- this has to be a closure over `index`
+        newindex = function(value)
+            return add_stl_tbl(index, value)
+        end,
+        index = function()
+            return statusline[index]
+        end,
+    }
+end
 
 local statusline_dat = {
     items = {
@@ -20,41 +56,57 @@ local statusline_dat = {
         end,
     },
 }
-local function add_stl_tbl(index, value)
-    -- allow adding number-indexed tables (only) to statusline
-    if type(value) == 'table' then
-        statusline[index] = value
-        return
-    end
-    error('statusline configuration must be a table')
-end
--- index that is not found in `statusline_dat` and is a number should add directly to `statusline`
+-- index that is not found in `statusline_dat` and is a number should be added directly to `statusline`
 local statusline_dat_meta = {
     -- indexing key not found in original dat table
     __index = function(_, index)
         if type(index) == 'number' then
             -- inherit number-indexing from returned table
-            return {
-                -- should have newindex field returning function accepting one argument - new value
-                -- this has to be a closure over `index`
-                newindex = function(value)
-                    return add_stl_tbl(index, value)
-                end,
-                index = function()
-                    return statusline[index]
-                end,
-            }
+            return number_index_dat(index)
         end
     end
 }
 setmetatable(statusline_dat, statusline_dat_meta)
 local stl = dynamic_access_table({}, statusline_dat)
-local build_statusline = function(stl_tbl)
-    print('building statusline')
+
+local function lookup_func_name(item)
+    for name, func in pairs(items) do
+        if func == item then
+            return name
+        end
+    end
+    return nil
 end
+local function render_function(item)
+    local name = lookup_func_name(item)
+    if name then
+        return [[%{luaeval("require'satiable'.statusline.items.]]..name..[[()")}]]
+    end
+end
+local function render_simple(item)
+    return item
+end
+local renderers = {
+    ['function'] = render_function,
+    ['string'] = render_simple,
+    ['number'] = render_simple,
+}
+local function render_statusline(stl_tbl)
+    local rendered_items = {}
+    for _, item in ipairs(stl_tbl) do
+        table.insert(rendered_items, renderers[type(item)](item))
+    end
+    return table.concat(rendered_items, '')
+end
+local build_statusline = function()
+    for _, stl_table in ipairs(statusline) do
+        return render_statusline(stl_table)
+    end
+end
+
 stl = update_meta(stl, {
     __call = build_statusline,
-    __len = function(_)
+    __len = function()
         return #statusline
     end,
 })
