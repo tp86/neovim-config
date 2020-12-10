@@ -1,14 +1,14 @@
 local dat = require'satiable2.dynamic_access_table'
 local tbl_clear = require'satiable2.utils'.tbl_clear
 local update_meta = require'satiable2.utils'.update_meta
+local utils = require'satiable2.utils'
 
-local defaults = {}
+local defaults = {
+    statusline = {}
+}
 local default_items = {}
 local defaults_dat = {
     items = dat.access_during_assignment(default_items),
-    statusline = {
-        'a'
-    }
 }
 defaults = dat.dynamic_access_table(defaults, defaults_dat)
 defaults.items = {
@@ -81,9 +81,50 @@ defaults.items = {
 local items_defaults_meta = {
     __index = defaults.items
 }
+defaults.statusline = {
+    {
+        defaults.items.vim_truncate,
+        defaults.items.vim_file_path,
+        ' ',
+        defaults.items.vim_help_brackets,
+        defaults.items.vim_modified_brackets,
+        defaults.items.vim_readonly_brackets,
+        defaults.items.vim_align_separator,
+        '%-14.(',
+        -- TODO:
+        --  {
+        --      format = '-14.',
+        --      defaults.items.vim_line_number,
+        --      ',',
+        --      defaults.items.vim_column_number,
+        --      defaults.items.vim_virtual_column_number_alt
+        --  }
+        defaults.items.vim_line_number,
+        ',',
+        defaults.items.vim_column_number,
+        defaults.items.vim_virtual_column_number_alt,
+        '%)',
+        ' ',
+        -- defaults.items.space
+        defaults.items.vim_percentage_view,
+    }
+}
 
 local items = setmetatable({}, items_defaults_meta)
-local statusline = {}
+local statusline = setmetatable({}, {
+    __ipairs = function(tbl)
+        local function iter(t, i)
+            i = i + 1
+            local v = t[i]
+            if v ~= nil then
+                return i, v
+            else
+                return i, defaults.statusline[i - #t]
+            end
+        end
+        return iter, tbl, 0
+    end
+})
 
 local function add_stl_tbl(index, value)
     -- allow adding number-indexed tables (only) to statusline
@@ -151,11 +192,8 @@ local function render_statusline(stl_tbl)
     end
     return table.concat(rendered_items, '')
 end
-local function iter_statusline_with_defaults()
-    return ipairs(statusline)
-end
 local build_statusline = function()
-    for _, stl_table in iter_statusline_with_defaults() do
+    for _, stl_table in utils.ipairs(statusline) do
         return render_statusline(stl_table)
     end
 end

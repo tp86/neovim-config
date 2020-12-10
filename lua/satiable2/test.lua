@@ -49,7 +49,8 @@ end
 
 function TestStatuslineCall:test_returns_default_configuration_when_other_not_set()
     self.satiable.statusline = {}
-    lu.assert_equals(self.statusline(), 'a', 'statusline call without configuration should return default')
+    lu.assert_equals(self.statusline(), '%<%f %h%m%r%=%-14.(%l,%c%V%) %P',
+        'statusline call without configuration should return default')
 end
 
 TestStatuslineStructure = {}
