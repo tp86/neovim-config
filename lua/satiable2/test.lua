@@ -25,6 +25,7 @@ end
 TestStatuslineCall = {}
 function TestStatuslineCall:setUp()
     local satiable = module_cleanup('satiable2')
+    self.satiable = satiable
     self.statusline = satiable.statusline
 end
 
@@ -40,10 +41,15 @@ function TestStatuslineCall:test_returns_rendered_statusline_string_based_on_tab
     self.statusline[1] = {
         items.a,
         ' ',
-        'b',
+        3,
     }
-    lu.assert_equals(self.statusline(), [[%{luaeval("require'satiable'.statusline.items.a()")} b]],
+    lu.assert_equals(self.statusline(), [[%{luaeval("require'satiable'.statusline.items.a()")} 3]],
         'statusline call should return rendered statusline string')
+end
+
+function TestStatuslineCall:test_returns_default_configuration_when_other_not_set()
+    self.satiable.statusline = {}
+    lu.assert_equals(self.statusline(), 'a', 'statusline call without configuration should return default')
 end
 
 TestStatuslineStructure = {}
@@ -146,16 +152,22 @@ end
 function TestItemsStructure:test_items_table_has_default_items()
     self.satiable.statusline.items = {}
     local vim_builtins = {
-        'file_path', 'full_file_path', 'file_name', 'modified_brackets', 'modified_comma',
-        'readonly_brackets', 'readonly_comma', 'help_brackets', 'help_comma', 'preview_brackets',
-        'preview_comma', 'filetype_brackets', 'filetype_comma', 'qf_loc_list', 'keymap',
-        'buffer_number', 'cursor_char', 'cursor_char_hex', 'cursor_offset', 'cursor_offset_hex',
-        'line_number', 'line_count', 'column_number', 'virtual_column_number', 'virtual_column_number_alt',
-        'percentage_lines', 'percentage_view', 'args', 'truncate', 'align_separator',
-        'percent_sign'
+        'vim_file_path', 'vim_full_file_path', 'vim_file_name', 'vim_modified_brackets', 'vim_modified_comma',
+        'vim_readonly_brackets', 'vim_readonly_comma', 'vim_help_brackets', 'vim_help_comma', 'vim_preview_brackets',
+        'vim_preview_comma', 'vim_filetype_brackets', 'vim_filetype_comma', 'vim_qf_loc_list', 'vim_keymap',
+        'vim_buffer_number', 'vim_cursor_char', 'vim_cursor_char_hex', 'vim_cursor_offset', 'vim_cursor_offset_hex',
+        'vim_line_number', 'vim_line_count', 'vim_column_number', 'vim_virtual_column_number',
+        'vim_virtual_column_number_alt', 'vim_percentage_lines', 'vim_percentage_view', 'vim_args', 'vim_truncate',
+        'vim_align_separator', 'vim_percent_sign'
     }
     for _, item in ipairs(vim_builtins) do
         lu.assert_not_nil(self.items[item], 'items should have default `'..item..'` from builtin items')
+    end
+    local builtins = {
+        'cwd_path_sep', 'cwd', 'cwd_shortened', 'bufname', 'bufname_full', 'filename', 'file_path_relative_shortened'
+    }
+    for _, item in ipairs(builtins) do
+        lu.assert_not_nil(self.items[item], 'items should have default `'..item..'`from builtin items')
     end
 end
 

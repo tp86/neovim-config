@@ -1,41 +1,82 @@
-local dynamic_access_table = require'satiable2.dynamic_access_table'
+local dat = require'satiable2.dynamic_access_table'
 local tbl_clear = require'satiable2.utils'.tbl_clear
 local update_meta = require'satiable2.utils'.update_meta
 
-local defaults = {
-    items = {
-        file_path = '%f',
-        full_file_path = '%F',
-        file_name = '%t',
-        modified_brackets = '%m',
-        modified_comma = '%M',
-        readonly_brackets = '%r',
-        readonly_comma = '%R',
-        help_brackets = '%h',
-        help_comma = '%H',
-        preview_brackets = '%w',
-        preview_comma = '%W',
-        filetype_brackets = '%y',
-        filetype_comma = '%Y',
-        qf_loc_list = '%q',
-        keymap = '%k',
-        buffer_number = '%n',
-        cursor_char = '%b',
-        cursor_char_hex = '%B',
-        cursor_offset = '%o',
-        cursor_offset_hex = '%O',
-        line_number = '%l',
-        line_count = '%L',
-        column_number = '%c',
-        virtual_column_number = '%v',
-        virtual_column_number_alt = '%V',
-        percentage_lines = '%p',
-        percentage_view = '%P',
-        args = '%a',
-        truncate = '%<',
-        align_separator = '%=',
-        percent_sign = '%%',
+local defaults = {}
+local default_items = {}
+local defaults_dat = {
+    items = dat.access_during_assignment(default_items),
+    statusline = {
+        'a'
     }
+}
+defaults = dat.dynamic_access_table(defaults, defaults_dat)
+defaults.items = {
+    -- vim builtin items
+    vim_file_path = '%f',
+    vim_full_file_path = '%F',
+    vim_file_name = '%t',
+    vim_modified_brackets = '%m',
+    vim_modified_comma = '%M',
+    vim_readonly_brackets = '%r',
+    vim_readonly_comma = '%R',
+    vim_help_brackets = '%h',
+    vim_help_comma = '%H',
+    vim_preview_brackets = '%w',
+    vim_preview_comma = '%W',
+    vim_filetype_brackets = '%y',
+    vim_filetype_comma = '%Y',
+    vim_qf_loc_list = '%q',
+    vim_keymap = '%k',
+    vim_buffer_number = '%n',
+    vim_cursor_char = '%b',
+    vim_cursor_char_hex = '%B',
+    vim_cursor_offset = '%o',
+    vim_cursor_offset_hex = '%O',
+    vim_line_number = '%l',
+    vim_line_count = '%L',
+    vim_column_number = '%c',
+    vim_virtual_column_number = '%v',
+    vim_virtual_column_number_alt = '%V',
+    vim_percentage_lines = '%p',
+    vim_percentage_view = '%P',
+    vim_args = '%a',
+    vim_truncate = '%<',
+    vim_align_separator = '%=',
+    vim_percent_sign = '%%',
+    -- satiable default items
+    cwd_path_sep = function()
+        -- for directories, :p adds path separator at the end
+        return vim.fn.fnamemodify(vim.fn.getcwd(), ':p')
+    end,
+    cwd = function()
+        -- remove trailing path sep
+        return string.sub(defaults.items.cwd_path_sep(), 1, -2)
+    end,
+    cwd_shortened = function()
+        return vim.fn.pathshorten(defaults.items.cwd())
+    end,
+    bufname = function()
+        return vim.fn.bufname()
+    end,
+    bufname_full = function()
+        return vim.fn.fnamemodify(defaults.items.bufname(), ':p')
+    end,
+    filename = function()
+        return vim.fn.fnamemodify(defaults.items.bufname(), ':t')
+    end,
+    file_path_relative_shortened = function()
+        local cwd_escaped = vim.fn.escape(defaults.items.cwd_path_sep(), [[\%]])
+        local relative_path = vim.fn.matchstr(defaults.items.bufname_full(), [[\v]]..cwd_escaped..[[\zs.*$]])
+        if string.len(relative_path) == 0 then
+            relative_path = defaults.items.bufname_full()
+        end
+        local relative_dir = vim.fn.fnamemodify(relative_path, ':h')
+        if relative_dir == '.' then
+            return defaults.items.filename()
+        end
+        return vim.fn.expand(vim.fn.pathshorten(relative_dir)..'/'..defaults.items.filename())
+    end
 }
 local items_defaults_meta = {
     __index = defaults.items
@@ -66,19 +107,7 @@ local number_index_dat = function(index)
 end
 
 local statusline_dat = {
-    items = {
-        index = function()
-            return items
-        end,
-        newindex = function(new_items)
-            items = tbl_clear(items)
-            if new_items and vim.tbl_count(new_items) > 0 then
-                for key, value in pairs(new_items) do
-                    items[key] = value
-                end
-            end
-        end,
-    },
+    items = dat.access_during_assignment(items),
 }
 -- index that is not found in `statusline_dat` and is a number should be added directly to `statusline`
 local statusline_dat_meta = {
@@ -91,7 +120,7 @@ local statusline_dat_meta = {
     end
 }
 setmetatable(statusline_dat, statusline_dat_meta)
-local stl = dynamic_access_table({}, statusline_dat)
+local stl = dat.dynamic_access_table({}, statusline_dat)
 
 local function lookup_func_name(item)
     for name, func in pairs(items) do
@@ -122,8 +151,11 @@ local function render_statusline(stl_tbl)
     end
     return table.concat(rendered_items, '')
 end
+local function iter_statusline_with_defaults()
+    return ipairs(statusline)
+end
 local build_statusline = function()
-    for _, stl_table in ipairs(statusline) do
+    for _, stl_table in iter_statusline_with_defaults() do
         return render_statusline(stl_table)
     end
 end
@@ -150,4 +182,4 @@ local m = {
         end
     },
 }
-return dynamic_access_table({}, m)
+return dat.dynamic_access_table({}, m)
