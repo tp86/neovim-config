@@ -1,131 +1,219 @@
--- TODO defaults
-local function identity(value)
+local function tbl_ipairs(tbl)
+    local ipairs_handler = getmetatable(tbl).__ipairs
+    if ipairs_handler then
+        local iter, t, init = ipairs_handler(tbl)
+        return iter, t, init
+    else
+        return ipairs(tbl)
+    end
+end
+local function tbl_clear(tbl)
+    if vim.tbl_count(tbl) > 0 then
+        for key in pairs(tbl) do
+            rawset(tbl, key, nil)
+        end
+    end
+    return tbl
+end
+
+local defaults = {}
+defaults.items = {
+    -- vim builtin items
+    vim_file_path = '%f',
+    vim_full_file_path = '%F',
+    vim_file_name = '%t',
+    vim_modified_brackets = '%m',
+    vim_modified_comma = '%M',
+    vim_readonly_brackets = '%r',
+    vim_readonly_comma = '%R',
+    vim_help_brackets = '%h',
+    vim_help_comma = '%H',
+    vim_preview_brackets = '%w',
+    vim_preview_comma = '%W',
+    vim_filetype_brackets = '%y',
+    vim_filetype_comma = '%Y',
+    vim_qf_loc_list = '%q',
+    vim_keymap = '%k',
+    vim_buffer_number = '%n',
+    vim_cursor_char = '%b',
+    vim_cursor_char_hex = '%B',
+    vim_cursor_offset = '%o',
+    vim_cursor_offset_hex = '%O',
+    vim_line_number = '%l',
+    vim_line_count = '%L',
+    vim_column_number = '%c',
+    vim_virtual_column_number = '%v',
+    vim_virtual_column_number_alt = '%V',
+    vim_percentage_lines = '%p',
+    vim_percentage_view = '%P',
+    vim_args = '%a',
+    vim_truncate = '%<',
+    vim_align_separator = '%=',
+    vim_percent_sign = '%%',
+    -- satiable default items
+    space = ' ',
+    comma = ',',
+    cwd_path_sep = function()
+        -- for directories, :p adds path separator at the end
+        return vim.fn.fnamemodify(vim.fn.getcwd(), ':p')
+    end,
+    cwd = function()
+        -- remove trailing path sep
+        return string.sub(defaults.items.cwd_path_sep(), 1, -2)
+    end,
+    cwd_shortened = function()
+        return vim.fn.pathshorten(defaults.items.cwd())
+    end,
+    bufname = function()
+        return vim.fn.bufname()
+    end,
+    bufname_full = function()
+        return vim.fn.fnamemodify(defaults.items.bufname(), ':p')
+    end,
+    filename = function()
+        return vim.fn.fnamemodify(defaults.items.bufname(), ':t')
+    end,
+    file_path_relative_shortened = function()
+        local cwd_escaped = vim.fn.escape(defaults.items.cwd_path_sep(), [[\%]])
+        local relative_path = vim.fn.matchstr(defaults.items.bufname_full(), [[\v]]..cwd_escaped..[[\zs.*$]])
+        if string.len(relative_path) == 0 then
+            relative_path = defaults.items.bufname_full()
+        end
+        local relative_dir = vim.fn.fnamemodify(relative_path, ':h')
+        if relative_dir == '.' then
+            return defaults.items.filename()
+        end
+        return vim.fn.expand(vim.fn.pathshorten(relative_dir)..'/'..defaults.items.filename())
+    end
+}
+defaults.statusline = {
+    {
+        defaults.items.vim_truncate,
+        defaults.items.vim_file_path,
+        defaults.items.space,
+        defaults.items.vim_help_brackets,
+        defaults.items.vim_modified_brackets,
+        defaults.items.vim_readonly_brackets,
+        defaults.items.vim_align_separator,
+        '%-14.(',
+        -- TODO:
+        --  {
+        --      format = '-14.',
+        --      defaults.items.vim_line_number,
+        --      ',',
+        --      defaults.items.vim_column_number,
+        --      defaults.items.vim_virtual_column_number_alt
+        --  }
+        defaults.items.vim_line_number,
+        defaults.items.comma,
+        defaults.items.vim_column_number,
+        defaults.items.vim_virtual_column_number_alt,
+        '%)',
+        defaults.items.space,
+        -- defaults.items.space
+        defaults.items.vim_percentage_view,
+    }
+}
+local function is_fulfilled(condition)
+    return condition == nil or condition()
+end
+-- add default items names
+local items_names = {}
+for name, item in pairs(defaults.items) do
+    items_names[item] = name
+end
+local function render_function(item)
+    local item_name = items_names[item]
+    if item_name then
+        return [[%{luaeval("require'satiable'.items.]]..item_name..[[()")}]]
+    end
+end
+local function render_self(item)
+    return item
+end
+local renderer = {
+    ['function'] = render_function,
+    ['string'] = render_self, --TODO chunk as string
+    ['number'] = render_self,
+}
+local function render_group(group)
+    --TODO handle format (optional and conditional)
+    --TODO handle highlights (optional and conditional)
+    local rendered = {}
+    for _, item in ipairs(group) do
+        table.insert(rendered, renderer[type(item)](item))
+    end
+    if #group > 1 then
+        table.insert(rendered, 1, '%(')
+        table.insert(rendered, '%)')
+    end
+    return table.concat(rendered, '')
+end
+renderer['table'] = render_group
+local function render_statusline_config(stl_config_tbl)
+    -- TODO caching items calls
+    local rendered = {}
+    for _, item in ipairs(stl_config_tbl) do
+        table.insert(rendered, renderer[type(item)](item))
+    end
+    return table.concat(rendered, '')
+end
+local function render_statusline(stl_tbl)
+    for _, stl_config_tbl in tbl_ipairs(stl_tbl) do
+        local condition = stl_config_tbl.condition
+        if is_fulfilled(condition) then
+            return render_statusline_config(stl_config_tbl)
+        end
+    end
+end
+local statusline_meta = {}
+local function configure_table(tbl, t)
+    if type(t) == 'table' then
+        tbl = tbl_clear(tbl)
+        for k, v in pairs(t) do
+            tbl[k] = v
+        end
+    end
+end
+statusline_meta.__call = function(stl_tbl, tbl)
+    if tbl == nil then
+        return render_statusline(stl_tbl)
+    else
+        configure_table(stl_tbl, tbl)
+    end
+end
+statusline_meta.__index = function(stl_tbl, index)
+    local value = rawget(stl_tbl, index)
+    if value == nil then
+        value = defaults.statusline[index - #stl_tbl]
+    end
     return value
 end
-local conversions = {
-    ['function'] = identity,
-    ['string'] = identity -- TODO
-}
-local function convert(value)
-    local conversion_func = conversions[type(value)]
-    return conversion_func(value)
-end
-local parts_meta = {
-    __newindex = function(t, k, v)
-        -- TODO convert v
-        -- function -> function (no conversion)
-        -- string
-        --      valid chunk -> function
-        --      else -> string (no conversion)
-        local converted = convert(v)
-        rawset(t, k, converted)
-    end
-}
-local cached_parts = {}
-local cached_parts_names = setmetatable({}, {__mode = 'k'})
-local cache = function(tbl)
-    local cache_table = {}
-    local cache_meta = {
-        __index = function(t, key)
-            local value = tbl[key]
-            if type(value) == 'function' then
-                local ret_value = value()
-                value = function()
-                    return ret_value
-                end
-            end
-            rawset(t, key, value)
-            rawset(cached_parts_names, value, key)
-            return value
-        end,
-        __newindex = tbl
-    }
-    setmetatable(cache_table, cache_meta)
-    return cache_table
-end
-local function new_parts()
-    local parts = {}
-    setmetatable(parts, parts_meta)
-    cached_parts = cache(parts)
-    return parts
-end
-local parts = new_parts()
---local statusline_built = {}
-local function build_statusline_part(part_name)
-    -- TODO multiple statuslines (with defaults as last)
-    -- TODO strings in statusline
-    -- TODO conditions
-    -- TODO highlights (conditional)
-    -- TODO grouping
-    -- TODO item width and justification
-    local part_type = type(cached_parts[part_name])
-    if part_type == 'function' then
-        return [[%{luaeval("require'satiable'.parts.]]..part_name..'()")}'
-    end
-    return cached_parts[part_name]
-end
-local function new_statusline()
-    local statusline = {}
-    return setmetatable(statusline, {
-        __newindex = function(t, k, v)
-            --rawset(statusline_built, k, build_statusline_part(cached_parts_names[v]))
-            rawset(t, k, v)
-        end,
-        __call = function(t)
-            cached_parts = cache(parts)
-            local statusline_built = {}
-            for _, statusline_part in ipairs(t) do
-                table.insert(statusline_built, build_statusline_part(cached_parts_names[statusline_part]))
-            end
-            local statusline = table.concat(statusline_built, '')
-            collectgarbage()
-            return statusline
+statusline_meta.__ipairs = function(stl_tbl)
+    local function iter(tbl, index)
+        index = index + 1
+        local value = tbl[index]
+        if value ~= nil then
+            return index, value
         end
-    })
+    end
+    return iter, stl_tbl, 0
 end
-local statusline = new_statusline()
-
+local statusline = {}
+setmetatable(statusline, statusline_meta)
+local items_meta = {
+    __call = configure_table,
+    __index = defaults.items,
+    __newindex = function(tbl, key, value)
+        items_names[value] = key
+        rawset(tbl, key, value)
+    end,
+}
+local items = {}
+setmetatable(items, items_meta)
 local m = {
-    parts = {
-        getter = function()
-            return cached_parts
-        end,
-        setter = function(new_value)
-            parts = new_parts()
-            cached_parts = cache(parts)
-            for key, value in pairs(new_value) do
-                parts[key] = value
-            end
-        end,
-    },
-    statusline = {
-        getter = function()
-            return statusline
-        end,
-        setter = function(new_value)
-            statusline = new_statusline()
-            for i, value in ipairs(new_value) do
-                statusline[i] = value
-            end
-        end
-    },
-    cached_parts_names = {
-        getter = function()
-            return cached_parts_names
-        end
-    }
+    statusline = statusline,
+    items = items,
 }
-local m_meta = {
-    __index = function(_, field)
-        local field_getter = m[field].getter
-        if field_getter then
-            return field_getter()
-        end
-    end,
-    __newindex = function(_, field, value)
-        local field_setter = m[field].setter
-        if field_setter then return field_setter(value) end
-    end,
-    __metatable = nil
-}
-return setmetatable({}, m_meta)
+
+return m

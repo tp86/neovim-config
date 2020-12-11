@@ -173,10 +173,12 @@ function TestItemsStructure:test_items_table_has_default_items()
 end
 
 
-lu.LuaUnit.run()
+--lu.LuaUnit.run()
 
 -- cleanup after running tests
 TestStatusline = nil
 TestStatuslineStructure = nil
 TestItems = nil
+TestItemsStructure = nil
+TestStatuslineCall = nil
 package.loaded.luaunit = nil
