@@ -95,26 +95,19 @@ defaults.statusline = {
         defaults.items.vim_modified_brackets,
         defaults.items.vim_readonly_brackets,
         defaults.items.vim_align_separator,
-        '%-14.(',
-        -- TODO:
-        --  {
-        --      format = '-14.',
-        --      defaults.items.vim_line_number,
-        --      ',',
-        --      defaults.items.vim_column_number,
-        --      defaults.items.vim_virtual_column_number_alt
-        --  }
-        defaults.items.vim_line_number,
-        defaults.items.comma,
-        defaults.items.vim_column_number,
-        defaults.items.vim_virtual_column_number_alt,
-        '%)',
+        {
+            format = '-14.',
+            defaults.items.vim_line_number,
+            defaults.items.comma,
+            defaults.items.vim_column_number,
+            defaults.items.vim_virtual_column_number_alt
+        },
         defaults.items.space,
-        -- defaults.items.space
         defaults.items.vim_percentage_view,
     }
 }
 local function is_fulfilled(condition)
+    -- TODO proper condition
     return condition == nil or condition()
 end
 -- add default items names
@@ -137,8 +130,6 @@ local renderer = {
     ['number'] = render_self,
 }
 local function render_group(group)
-    --TODO handle format (optional and conditional)
-    --TODO handle highlights (optional and conditional)
     local rendered = {}
     for _, item in ipairs(group) do
         table.insert(rendered, renderer[type(item)](item))
@@ -147,7 +138,22 @@ local function render_group(group)
         table.insert(rendered, 1, '%(')
         table.insert(rendered, '%)')
     end
-    return table.concat(rendered, '')
+    rendered = table.concat(rendered, '')
+    -- handle format
+    local format = group.format or ''
+    -- TODO handle case when format is table containing condition and format string
+    -- only one case when first character in `rendered` is not '%'
+    -- single item being regular string (not vim stl item)
+    local first_char = string.sub(rendered, 1, 1)
+    if first_char == '%' then
+        rendered = '%'..format..string.sub(rendered, 2)
+    elseif #format > 0 then
+        -- surround regular string in group only when there is format
+        rendered = '%'..format..'('..rendered..'%)'
+    end
+    -- TODO apply highlighting if exists
+    -- handle condition and multiple possible highlight groups
+    return rendered
 end
 renderer['table'] = render_group
 local function render_statusline_config(stl_config_tbl)

@@ -79,6 +79,18 @@ function TestStatusline:test_statusline_renders_subtables_with_multiple_items_as
         'statusline should render subtables with multiple items as groups')
 end
 
+function TestStatusline:test_statusline_renders_subtables_with_single_item_as_item()
+    self.statusline{
+        {
+            {
+                'a'
+            }
+        }
+    }
+    lu.assert_equals(self.statusline(), 'a',
+        '')
+end
+
 TestItems = {}
 
 function TestItems:setUp()
@@ -183,7 +195,7 @@ function TestStatuslineItems:test_statusline_renders_functions_as_expressions()
         }
     }
     lu.assert_equals(self.statusline(), [[%{luaeval("require'satiable'.items.a()")}]],
-        '')
+        'items that are functions are rendered as expressions')
 end
 
 
