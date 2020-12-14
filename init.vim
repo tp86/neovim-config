@@ -46,7 +46,7 @@ augroup quickfix_window
 augroup end
 
 "" statusline
-set statusline=%!statusline#active()
+set statusline=%!luaeval('require\''stl_tbl\''.statusline()')
 "" tabline
 " TODO
 
