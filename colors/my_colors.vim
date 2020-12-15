@@ -1,4 +1,4 @@
-runtime colors/morning.vim
+runtime colors/NeoSolarized.vim
 
 function! s:get_attr(group, attr)
   return synIDattr(synIDtrans(highlightID(a:group)), a:attr, "gui")
@@ -17,22 +17,33 @@ execute "highlight ".."SignColumn".." guibg".."="..s:darken(s:get_attr("Normal",
 
 " statusline colors
 "let s:stl_fg = synIDattr(synIDtrans(highlightID("StatusLine")), "fg", "gui")
-let s:stl_bg = s:lighten(s:get_attr("Normal", "bg"), "#101010")
-let s:stl_nc_bg = s:lighten("Black", "#606060")
-execute "highlight! ".."StatusLine".." gui=NONE guifg=Black guibg="..s:stl_bg
-execute "highlight! ".."StatusLineNC".." gui=NONE guifg=LightGray guibg="..s:stl_nc_bg
+"let s:stl_bg = s:lighten(s:get_attr("Normal", "bg"), "#02090a")
+let s:stl_bg = {
+      \ "light": "White",
+      \ "dark": "Black",
+      \}
+"let s:stl_nc_bg = s:lighten("Black", "#606060")
+let s:stl_nc_bg = {
+      \ "light": "#657b83",
+      \ "dark": "#073642",
+      \}
+execute "highlight! ".."StatusLine".." gui=NONE guifg=Black guibg="..s:stl_bg[&background]
+execute "highlight! ".."StatusLineNC".." gui=NONE guifg=LightGray guibg="..s:stl_nc_bg[&background]
 
 let s:stl_cwd_fg = "#399cbd"
-execute "highlight! ".."StlCwd".." guifg="..s:stl_cwd_fg.." gui=bold guibg="..s:stl_bg
-execute "highlight! ".."StlNCCwd".." guifg="..s:stl_cwd_fg.." gui=bold guibg="..s:stl_nc_bg
+execute "highlight! ".."StlCwd".." guifg="..s:stl_cwd_fg.." gui=bold guibg="..s:stl_bg[&background]
+execute "highlight! ".."StlNCCwd".." guifg="..s:stl_cwd_fg.." gui=bold guibg="..s:stl_nc_bg[&background]
 
 let s:stl_fname_mod_fg = "#ff2727"
 let s:stl_fname_ro_fg = "#00c400"
-execute "highlight! ".."StlFname".." gui=bold guifg=".."Black".." guibg="..s:stl_bg
-execute "highlight! ".."StlNCFname".." gui=bold guifg=".."LightGray".." guibg="..s:stl_nc_bg
-execute "highlight! ".."StlFnameMod".." gui=bold guifg="..s:stl_fname_mod_fg.." guibg="..s:stl_bg
-execute "highlight! ".."StlNCFnameMod".." gui=bold guifg="..s:stl_fname_mod_fg.." guibg="..s:stl_nc_bg
-execute "highlight! ".."StlFnameRo".." gui=bold guifg="..s:stl_fname_ro_fg.." guibg="..s:stl_bg
-execute "highlight! ".."StlNCFnameRo".." gui=bold guifg="..s:stl_fname_ro_fg.." guibg="..s:stl_nc_bg
+execute "highlight! ".."StlFname".." gui=bold guifg=".."Black".." guibg="..s:stl_bg[&background]
+execute "highlight! ".."StlNCFname".." gui=bold guifg=".."LightGray".." guibg="..s:stl_nc_bg[&background]
+execute "highlight! ".."StlFnameMod".." gui=bold guifg="..s:stl_fname_mod_fg.." guibg="..s:stl_bg[&background]
+execute "highlight! ".."StlNCFnameMod".." gui=bold guifg="..s:stl_fname_mod_fg.." guibg="..s:stl_nc_bg[&background]
+execute "highlight! ".."StlFnameRo".." gui=bold guifg="..s:stl_fname_ro_fg.." guibg="..s:stl_bg[&background]
+execute "highlight! ".."StlNCFnameRo".." gui=bold guifg="..s:stl_fname_ro_fg.." guibg="..s:stl_nc_bg[&background]
+
+highlight! link vimSet NONE
+highlight! link vimSetEqual NONE
 
 let g:colors_name = "my_colors"

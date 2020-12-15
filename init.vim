@@ -11,6 +11,23 @@ EOF
 
 let mapleader = " "
 
+" Plugins
+let s:plug_file = expand(fnamemodify($MYVIMRC, ":p:h").."/autoload/plug.vim")
+if empty(glob(s:plug_file))
+  let s:curl = "curl"
+  if has("win32")
+    let s:curl ..= ".exe"
+  endif
+  silent execute "!" .. s:curl .. " -fLo " .. s:plug_file .. " --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim"
+  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+endif
+
+call plug#begin()
+
+Plug 'overcache/NeoSolarized'
+
+call plug#end()
+
 set hidden
 
 " UI settings
@@ -46,7 +63,9 @@ augroup quickfix_window
 augroup end
 
 "" statusline
-set statusline=%!statusline#active()
+if has("nvim-0.5.0")
+  set statusline=%!luaeval('require\''stl_tbl\''.statusline()')
+endif
 "" tabline
 " TODO
 
