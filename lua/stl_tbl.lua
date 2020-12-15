@@ -90,39 +90,14 @@ local conditions = {}
 conditions.active = function()
     return vim.api.nvim_get_var('actual_curwin') == string.format('%d', vim.fn.win_getid())
 end
-conditions.inactive = function()
-    return not conditions.active()
-end
 conditions.mod = function()
     return vim.api.nvim_buf_get_option(0, 'modified')
-end
-conditions.nomod = function()
-    return not conditions.mod()
 end
 conditions.ro = function()
     return vim.api.nvim_buf_get_option(0, 'readonly')
 end
-conditions.noro = function()
-    return not vim.api.nvim_buf_get_option(0, 'readonly')
-end
-conditions.mod_active = function()
-    return conditions.active() and conditions.mod()
-end
-conditions.mod_inactive = function()
-    return conditions.inactive() and conditions.mod()
-end
-conditions.ro_active = function()
-    return conditions.active() and conditions.nomod() and conditions.ro()
-end
-
-conditions.ro_inactive = function()
-    return conditions.inactive() and conditions.nomod() and conditions.ro()
-end
-conditions.fname_active = function()
-    return conditions.active() and conditions.nomod() and conditions.noro()
-end
-conditions.fname_inactive = function()
-    return conditions.inactive() and conditions.nomod() and conditions.noro()
+conditions.term_buffer = function()
+    return vim.fn.match(m.items.bufname_full(), [[\v^term://]]) == 0
 end
 m.items = {
     bufname = function()
@@ -152,29 +127,89 @@ m.items = {
         else
             return vim.fn.expand(vim.fn.pathshorten(relative_dir)..'/'..m.items.filename())
         end
-    end
+    end,
+    term = function()
+        local splitted_uri = vim.fn.split(m.items.bufname_full(), ':')
+        local shell_pid = vim.fn.fnamemodify(splitted_uri[2], ':t')
+        local shell_exec = vim.fn.fnamemodify(splitted_uri[#splitted_uri], ':t')
+        return table.concat({splitted_uri[1], shell_pid, shell_exec}, ':')
+    end,
 }
 local statusline = {
     {
-        when = conditions.active,
+        when = function()
+            return conditions.active() and not conditions.term_buffer()
+        end,
         highlight = 'StlCwd',
         m.items.cwd_shortened,
         ': ',
     },
     {
+        when = function()
+            return not conditions.term_buffer()
+        end,
         highlight = {
-            { when = conditions.mod_active, 'StlFnameMod' },
-            { when = conditions.mod_inactive, 'StlNCFnameMod' },
-            { when = conditions.ro_active, 'StlFnameRo' },
-            { when = conditions.ro_inactive, 'StlNCFnameRo' },
-            { when = conditions.fname_active, 'StlFname' },
-            { when = conditions.fname_inactive, 'StlNCFname' },
+            {
+                'StlFnameMod',
+                when = function()
+                    return  conditions.active() and
+                            conditions.mod()
+                end,
+            },
+            {
+                'StlNCFnameMod',
+                when = function()
+                    return  not conditions.active() and
+                            conditions.mod()
+                end,
+            },
+            {
+                'StlFnameRo',
+                when = function()
+                    return  conditions.active() and
+                            not conditions.mod() and
+                            conditions.ro()
+                end,
+            },
+            {
+                'StlNCFnameRo',
+                when = function()
+                    return  not conditions.active() and
+                            not conditions.mod() and
+                            conditions.ro()
+                end,
+            },
+            {
+                'StlFname',
+                when = function()
+                    return  conditions.active() and
+                            not conditions.mod() and
+                            not conditions.ro()
+                end,
+            },
+            {
+                'StlNCFname',
+                when = function()
+                    return  not conditions.active() and
+                            not conditions.mod() and
+                            not conditions.ro()
+                end,
+            },
 
         },
         m.items.file_path_relative
     },
-    '%=',
-    '%l(%L):%-3c',
+    {
+        when = conditions.term_buffer,
+        m.items.term
+    },
+    {
+        when = function()
+            return not conditions.term_buffer()
+        end,
+        '%=',
+        '%l(%L):%-3c',
+    }
 }
 
 m.statusline = setmetatable(statusline, {
