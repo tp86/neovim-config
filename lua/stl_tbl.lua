@@ -1,92 +1,5 @@
 -- TODO cache m.items
 local m = {}
-local function make_hl_func(hl_def, f)
-    return function()
-        if hl_def.when() then
-            return f()
-        end
-        return ''
-    end
-end
-local function add_hl_item(hl_tbl, hl_group)
-    table.insert(hl_tbl, '%#'..hl_group..'#')
-end
-local function add_hl_func(hl_tbl, f_name)
-    table.insert(hl_tbl, [[%{luaeval("require'stl_tbl'.items.]]..f_name..[[()")}]])
-end
-local converters = {
-    function(item, f) -- conditional
-        if item.when then
-            return function()
-                if item.when() then
-                    return f()
-                end
-                return ''
-            end
-        end
-        return f
-    end,
-    function(item, f, item_index) -- highlights
-        if item.highlight then
-            local highlights = {}
-            if type(item.highlight) == 'table' then
-                for i, hl_def in ipairs(item.highlight) do
-                    add_hl_item(highlights, hl_def[1])
-                    local func_name = '_'..item_index..'_'..i
-                    m.items[func_name] = make_hl_func(hl_def, f)
-                    add_hl_func(highlights, func_name)
-                end
-            elseif type(item.highlight) == 'string' then
-                add_hl_item(highlights, item.highlight)
-                local func_name = '_'..item_index..'_' .. 0
-                m.items[func_name] = function() return f() end
-                add_hl_func(highlights, func_name)
-            end
-            table.insert(highlights, '%*')
-            return table.concat(highlights, '')
-        end
-        return f()
-    end,
-    -- TODO add format
-}
-local function lookup_func_name(tbl, func)
-    for name, value in pairs(tbl) do
-        if value == func then
-            return name
-        end
-    end
-end
-local item_type_dispatcher = {
-    ['table'] = function(item, item_index)
-        local group_func = function()
-            local group = {}
-            for _, item in ipairs(item) do
-                if type(item) == 'string' then
-                    table.insert(group, item)
-                elseif type(item) == 'function' then
-                    table.insert(group, item())
-                end
-            end
-            return table.concat(group, '')
-        end
-        local value = group_func
-        for _, converter in ipairs(converters) do
-            value = converter(item, value, item_index)
-        end
-        return value
-    end,
-    ['string'] = function(item)
-        return item
-    end,
-    ['function'] = function(item)
-        local func_name = lookup_func_name(m.items, item)
-        return [[%{luaeval("require'stl_tbl'.items.]]..func_name..[[()")}]]
-    end
-}
-local function converter(item, item_index)
-    return item_type_dispatcher[type(item)](item, item_index)
-end
-
 local conditions = {}
 conditions.active = function()
     return vim.api.nvim_get_var('actual_curwin') == string.format('%d', vim.fn.win_getid())
@@ -142,101 +55,122 @@ m.items = {
         return table.concat({splitted_uri[1], shell_pid, shell_exec}, ':')
     end,
 }
-local highlights = {
-    filename = {
-        {
-            'StlFnameMod',
-            when = function()
-                return  conditions.active() and
-                        conditions.mod()
-            end,
-        },
-        {
-            'StlNCFnameMod',
-            when = function()
-                return  not conditions.active() and
-                        conditions.mod()
-            end,
-        },
-        {
-            'StlFnameRo',
-            when = function()
-                return  conditions.active() and
-                        not conditions.mod() and
-                        conditions.ro()
-            end,
-        },
-        {
-            'StlNCFnameRo',
-            when = function()
-                return  not conditions.active() and
-                        not conditions.mod() and
-                        conditions.ro()
-            end,
-        },
-        {
-            'StlFname',
-            when = function()
-                return  conditions.active() and
-                        not conditions.mod() and
-                        not conditions.ro()
-            end,
-        },
-        {
-            'StlNCFname',
-            when = function()
-                return  not conditions.active() and
-                        not conditions.mod() and
-                        not conditions.ro()
-            end,
-        },
-    }
-}
-local statusline = {
-    {
-        when = function()
-            return conditions.active() and not conditions.term_buffer()
-        end,
-        highlight = 'StlCwd',
-        m.items.cwd_shortened,
-        ': ',
-    },
-    {
-        when = function()
-            return conditions.no_file() and not conditions.term_buffer()
-        end,
-        highlight = highlights.filename,
-        m.items.empty_file
-    },
-    {
-        when = function()
-            return not conditions.term_buffer() and not conditions.no_file()
-        end,
-        highlight = highlights.filename,
-        m.items.file_path_relative
-    },
-    {
-        when = function()
-            return conditions.term_buffer()
-        end,
-        m.items.term
-    },
-    {
-        when = function()
-            return not conditions.term_buffer()
-        end,
-        '%=',
-        '%l(%L):%-3c',
-    }
-}
-
-m.statusline = setmetatable(statusline, {
-    __call = function(tbl)
-        local items = {}
-        for i, item in ipairs(tbl) do
-            table.insert(items, converter(item, i))
-        end
-        return table.concat(items, '')
+local items = {}
+items.cwd = function()
+    return vim.fn.fnamemodify(vim.fn.getcwd(), ':~')
+end
+items.cwd_shortened = function()
+    return vim.fn.pathshorten(items.cwd())
+end
+items.bufname_full = function()
+    return vim.fn.fnamemodify(vim.fn.bufname(), ':p')
+end
+items.file_path_relative = function()
+    local full_cwd = vim.fn.escape(vim.fn.fnamemodify(vim.fn.getcwd(), ':p'), [[\%]])
+    local relative_path = vim.fn.matchstr(items.bufname_full(), [[\v^]]..full_cwd..[[\zs.*$]])
+    if #relative_path == 0 then
+        relative_path = items.bufname_full()
     end
-})
-return m
+    local relative_dir = vim.fn.fnamemodify(relative_path, ':h')
+    local filename = vim.fn.fnamemodify(items.bufname_full(), ':t')
+    if relative_dir == '.' then
+        return filename
+    else
+        return vim.fn.expand(vim.fn.pathshorten(relative_dir)..'/'..filename)
+    end
+end
+
+local conditions = {}
+conditions.active = function()
+    return vim.api.nvim_get_var('actual_curwin') == string.format('%d', vim.fn.win_getid())
+end
+conditions.mod = function()
+    return vim.api.nvim_buf_get_option(0, 'modified')
+end
+conditions.ro = function()
+    return vim.api.nvim_buf_get_option(0, 'readonly')
+end
+conditions.term_buffer = function()
+    return vim.fn.match(items.bufname_full(), [[\v^term://]]) == 0
+end
+conditions.special = function()
+    return conditions.term_buffer()
+end
+conditions.empty_file = function()
+    return #vim.fn.bufname() == 0
+end
+local filename_conditions = {
+    [1] = function()
+        return conditions.active()
+        and not conditions.empty_file()
+        and not conditions.special()
+        and not conditions.mod()
+        and not conditions.ro()
+    end,
+    [2] = function()
+        return conditions.active()
+        and not conditions.empty_file()
+        and not conditions.special()
+        and conditions.mod()
+    end,
+    [3] = function()
+        return conditions.active()
+        and not conditions.empty_file()
+        and not conditions.special()
+        and not conditions.mod()
+        and conditions.ro()
+    end,
+    [4] = function()
+        return not conditions.active()
+        and not conditions.empty_file()
+        and not conditions.special()
+        and not conditions.mod()
+        and not conditions.ro()
+    end,
+    [5] = function()
+        return not conditions.active()
+        and not conditions.empty_file()
+        and not conditions.special()
+        and conditions.mod()
+    end,
+    [6] = function()
+        return not conditions.active()
+        and not conditions.empty_file()
+        and not conditions.special()
+        and not conditions.mod()
+        and conditions.ro()
+    end,
+}
+return {
+    statusline = table.concat{
+        -- cwd part visible only in active window
+        [[%#StlCwd#%{luaeval("require'stl_tbl'.items.cwd()")}]],
+        [[%*]],
+        -- filename part with conditional highlighting and conditional visibility
+        [[%#StlFname#%{luaeval("require'stl_tbl'.items.filename(1)")}]],
+        [[%#StlFnameMod#%{luaeval("require'stl_tbl'.items.filename(2)")}]],
+        [[%#StlFnameRo#%{luaeval("require'stl_tbl'.items.filename(3)")}]],
+        [[%#StlNCFname#%{luaeval("require'stl_tbl'.items.filename(4)")}]],
+        [[%#StlNCFnameMod#%{luaeval("require'stl_tbl'.items.filename(5)")}]],
+        [[%#StlNCFnameRo#%{luaeval("require'stl_tbl'.items.filename(6)")}]],
+        [[%*]],
+        '%=',
+        '(%{pathshorten(FugitiveHead(8))})',
+        ' ',
+        '$[%.10(%{xolox#session#find_current_session()}%)]'
+    },
+    items = {
+        cwd = function()
+            if conditions.active() then
+                return items.cwd_shortened()..': '
+            end
+            return ''
+        end,
+        filename = function(cond)
+            if filename_conditions[cond]() then
+                return items.file_path_relative()
+            end
+            return ''
+        end,
+    },
+}

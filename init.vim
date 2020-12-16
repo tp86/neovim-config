@@ -29,9 +29,9 @@ Plug 'overcache/NeoSolarized'
 Plug 'tpope/vim-surround' " TODO which key
 Plug 'tmsvg/pear-tree'
 let g:pear_tree_ft_disabled = ['vim']
-let g:pear_tree_smart_openers = v:true
-let g:pear_tree_smart_closers = v:true
-let g:pear_tree_smart_backspace = v:true
+let g:pear_tree_smart_openers = 1
+let g:pear_tree_smart_closers = 1
+let g:pear_tree_smart_backspace = 1
 Plug 'junegunn/vim-easy-align' " TODO which key
 Plug 'justinmk/vim-sneak'
 let g:sneak#label = v:true
@@ -65,10 +65,6 @@ nnoremap <leader>e <cmd>NERDTreeToggleVCS<cr>
 Plug 'Xuyuanp/nerdtree-git-plugin'
 let g:NERDTreeGitStatusConcealBrackets = v:true
 Plug 'tpope/vim-projectionist'
-Plug 'SirVer/UltiSnips'
-let g:UltiSnipsExpandTrigger = "<tab>"
-let g:UltiSnipsJumpForwardTrigger = "<tab>"
-let g:UltiSnipsJumpBackwardTrigger = "<s-tab>"
 Plug 'neovim/nvim-lspconfig'
 
 call plug#end()
@@ -109,7 +105,7 @@ augroup end
 
 "" statusline
 if has('nvim-0.5.0')
-  set statusline=%!luaeval('require\''stl_tbl\''.statusline()')
+  set statusline=%!luaeval('require\''stl_tbl\''.statusline')
 endif
 "" tabline
 " TODO
