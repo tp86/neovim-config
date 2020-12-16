@@ -9,22 +9,67 @@ vim.fn = vim.fn or setmetatable({}, {
 })
 EOF
 
-let mapleader = " "
+let mapleader = ' '
+let s:vim_home = fnamemodify($MYVIMRC, ':p:h')
 
 " Plugins
-let s:plug_file = expand(fnamemodify($MYVIMRC, ":p:h").."/autoload/plug.vim")
+let s:plug_file = expand(s:vim_home..'/autoload/plug.vim')
 if empty(glob(s:plug_file))
-  let s:curl = "curl"
-  if has("win32")
-    let s:curl ..= ".exe"
+  let s:curl = 'curl'
+  if has('win32')
+    let s:curl ..= '.exe'
   endif
-  silent execute "!" .. s:curl .. " -fLo " .. s:plug_file .. " --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim"
+  silent execute '!' .. s:curl .. ' -fLo ' .. s:plug_file .. ' --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
   autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
 
 call plug#begin()
 
 Plug 'overcache/NeoSolarized'
+Plug 'tpope/vim-surround' " TODO which key
+Plug 'tmsvg/pear-tree'
+let g:pear_tree_ft_disabled = ['vim']
+let g:pear_tree_smart_openers = v:true
+let g:pear_tree_smart_closers = v:true
+let g:pear_tree_smart_backspace = v:true
+Plug 'junegunn/vim-easy-align' " TODO which key
+Plug 'justinmk/vim-sneak'
+let g:sneak#label = v:true
+Plug 'tpope/vim-commentary' " TODO which key
+Plug 'junegunn/rainbow_parentheses.vim'
+let g:rainbow#max_level = 24
+augroup rainbow_activation
+  autocmd!
+  autocmd FileType clojure RainbowParentheses
+augroup end
+Plug 'xolox/vim-misc'
+Plug 'xolox/vim-session'
+let g:session_directory = expand(s:vim_home..'/sessions')
+set sessionoptions-=help
+set sessionoptions-=buffers
+set sessionoptions+=resize
+set sessionoptions+=winpos
+let g:session_autoload = 'yes'
+let g:session_autosave = 'yes'
+let g:session_default_to_last = v:true
+Plug 'tpope/vim-fugitive'
+Plug 'airblade/vim-gitgutter'
+set updatetime=400
+Plug 'preservim/nerdtree'
+let g:NERDTreeWinSize = 40
+let g:NERDTreeMapOpenVSplit = 'v'
+let g:NERDTreeMapOpenSplit = 's'
+let g:NERDTreeQuitOnOpen = v:true
+" TODO which key
+nnoremap <leader>e <cmd>NERDTreeToggleVCS<cr>
+Plug 'Xuyuanp/nerdtree-git-plugin'
+let g:NERDTreeGitStatusConcealBrackets = v:true
+Plug 'tpope/vim-projectionist'
+Plug 'SirVer/UltiSnips'
+let g:UltiSnipsExpandTrigger = "<tab>"
+let g:UltiSnipsJumpForwardTrigger = "<tab>"
+let g:UltiSnipsJumpBackwardTrigger = "<s-tab>"
+Plug 'neovim/nvim-lspconfig'
 
 call plug#end()
 
@@ -40,15 +85,15 @@ colorscheme my_colors
 "" interface
 set signcolumn=yes
 set nowrap
-let &listchars = join(["tab:\u00bb ", "trail:\u00b7", "precedes:\u27ea", "extends:\u27eb"], ",")
+let &listchars = join(["tab:\u00bb ", "trail:\u00b7", "precedes:\u27ea", "extends:\u27eb"], ',')
 set list
 set scrolloff=3
 set sidescrolloff=6
 augroup color_column
   autocmd!
   autocmd BufNewFile,BufRead,BufWinEnter,WinEnter *
-        \ let &l:colorcolumn = join(insert(range(120, 999), 80), ",")
-  autocmd WinLeave * let &l:colorcolumn = join(range(1, 999), ",")
+        \ let &l:colorcolumn = join(insert(range(120, 999), 80), ',')
+  autocmd WinLeave * let &l:colorcolumn = join(range(1, 999), ',')
 augroup end
 augroup cursor_line
   autocmd!
@@ -63,7 +108,7 @@ augroup quickfix_window
 augroup end
 
 "" statusline
-if has("nvim-0.5.0")
+if has('nvim-0.5.0')
   set statusline=%!luaeval('require\''stl_tbl\''.statusline()')
 endif
 "" tabline
@@ -125,14 +170,14 @@ set clipboard+=unnamed  " win32yank / xclip installation may be needed
 function! s:insert_put()
   let keys = "\<esc>g"
   if col(".") == 1
-    let keys ..= "P"
+    let keys ..= 'P'
   else
-    let keys ..= "p"
+    let keys ..= 'p'
   endif
-  if col(".") == col("$")
-    let keys ..= "a"
+  if col('.') == col('$')
+    let keys ..= 'a'
   else
-    let keys ..= "i"
+    let keys ..= 'i'
   endif
   return keys
 endfunction
@@ -152,7 +197,7 @@ function! s:empty_lines(count, above)
     let line_to_insert = new_position[0] - 1
     let new_position[0] += a:count
   endif
-  call append(line_to_insert, repeat([""], a:count))
+  call append(line_to_insert, repeat([''], a:count))
   call cursor(new_position)
 endfunction
 nnoremap <silent> [<cr> :<c-u>call <sid>empty_lines(v:count1, v:true)<cr>
@@ -173,7 +218,6 @@ let g:autoremove_trail_spaces = v:true
 command! AutoRemoveTrailSpaceToggle let g:autoremove_trail_spaces = !g:autoremove_trail_spaces
 augroup auto_remove_trail_space
   autocmd!
-  "" LUA
   function! s:remove_trail_space()
     let view = winsaveview()  " store view to avoid cursor movement to last removed trailing space position
     try

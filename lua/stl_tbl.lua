@@ -1,3 +1,4 @@
+-- TODO cache m.items
 local m = {}
 local function make_hl_func(hl_def, f)
     return function()
@@ -99,12 +100,18 @@ end
 conditions.term_buffer = function()
     return vim.fn.match(m.items.bufname_full(), [[\v^term://]]) == 0
 end
+conditions.no_file = function()
+    return #m.items.bufname() == 0
+end
 m.items = {
     bufname = function()
         return vim.fn.bufname()
     end,
     bufname_full = function()
         return vim.fn.fnamemodify(m.items.bufname(), ':p')
+    end,
+    empty_file = function()
+        return '[No Name]'
     end,
     filename = function()
         return vim.fn.fnamemodify(m.items.bufname(), ':t')
@@ -116,8 +123,8 @@ m.items = {
         return vim.fn.pathshorten(m.items.cwd())
     end,
     file_path_relative = function()
-        local full_cwd = vim.fn.escape(vim.fn.fnamemodify(m.items.cwd(), ':p'), [[\%]])
-        local relative_path = vim.fn.matchstr(m.items.bufname_full(), [[\v]]..full_cwd..[[\zs.*$]])
+        local full_cwd = vim.fn.escape(vim.fn.fnamemodify(vim.fn.getcwd(), ':p'), [[\%]])
+        local relative_path = vim.fn.matchstr(m.items.bufname_full(), [[\v^]]..full_cwd..[[\zs.*$]])
         if #relative_path == 0 then
             relative_path = m.items.bufname_full()
         end
@@ -135,6 +142,56 @@ m.items = {
         return table.concat({splitted_uri[1], shell_pid, shell_exec}, ':')
     end,
 }
+local highlights = {
+    filename = {
+        {
+            'StlFnameMod',
+            when = function()
+                return  conditions.active() and
+                        conditions.mod()
+            end,
+        },
+        {
+            'StlNCFnameMod',
+            when = function()
+                return  not conditions.active() and
+                        conditions.mod()
+            end,
+        },
+        {
+            'StlFnameRo',
+            when = function()
+                return  conditions.active() and
+                        not conditions.mod() and
+                        conditions.ro()
+            end,
+        },
+        {
+            'StlNCFnameRo',
+            when = function()
+                return  not conditions.active() and
+                        not conditions.mod() and
+                        conditions.ro()
+            end,
+        },
+        {
+            'StlFname',
+            when = function()
+                return  conditions.active() and
+                        not conditions.mod() and
+                        not conditions.ro()
+            end,
+        },
+        {
+            'StlNCFname',
+            when = function()
+                return  not conditions.active() and
+                        not conditions.mod() and
+                        not conditions.ro()
+            end,
+        },
+    }
+}
 local statusline = {
     {
         when = function()
@@ -146,61 +203,22 @@ local statusline = {
     },
     {
         when = function()
-            return not conditions.term_buffer()
+            return conditions.no_file() and not conditions.term_buffer()
         end,
-        highlight = {
-            {
-                'StlFnameMod',
-                when = function()
-                    return  conditions.active() and
-                            conditions.mod()
-                end,
-            },
-            {
-                'StlNCFnameMod',
-                when = function()
-                    return  not conditions.active() and
-                            conditions.mod()
-                end,
-            },
-            {
-                'StlFnameRo',
-                when = function()
-                    return  conditions.active() and
-                            not conditions.mod() and
-                            conditions.ro()
-                end,
-            },
-            {
-                'StlNCFnameRo',
-                when = function()
-                    return  not conditions.active() and
-                            not conditions.mod() and
-                            conditions.ro()
-                end,
-            },
-            {
-                'StlFname',
-                when = function()
-                    return  conditions.active() and
-                            not conditions.mod() and
-                            not conditions.ro()
-                end,
-            },
-            {
-                'StlNCFname',
-                when = function()
-                    return  not conditions.active() and
-                            not conditions.mod() and
-                            not conditions.ro()
-                end,
-            },
-
-        },
+        highlight = highlights.filename,
+        m.items.empty_file
+    },
+    {
+        when = function()
+            return not conditions.term_buffer() and not conditions.no_file()
+        end,
+        highlight = highlights.filename,
         m.items.file_path_relative
     },
     {
-        when = conditions.term_buffer,
+        when = function()
+            return conditions.term_buffer()
+        end,
         m.items.term
     },
     {

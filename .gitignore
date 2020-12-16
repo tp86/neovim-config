@@ -2,3 +2,4 @@
 autoload/plug.vim
 /plugged/
 
+/sessions/
