@@ -22,7 +22,7 @@ end
 local plug = vim.fn["plug#"]
 
 local function get_name(plugin)
-  return plugin[1]:match("^[%w-]+/([%s-_.]+])$")
+  return plugin[1]:match("^[%w-]+/([%w-_.]+)$")
 end
 
 local function is_lazy(plugin)
@@ -35,7 +35,11 @@ local function setup_plugins(plugins)
   for _, plugin in ipairs(plugins) do
     local repo = plugin[1]
     local opts = get_options(plugin)
-    plug(repo, opts)
+    if next(opts) then
+      plug(repo, opts)
+    else
+      plug(repo)
+    end
     local config = plugin.config
     if type(config) == "function" then
       local name = plugin.as or get_name(plugin)
@@ -60,21 +64,21 @@ local function configure_plugins(configs)
   end
 end
 
+local function extend(tbl, plugins_submodule)
+  local plugins = require("plugins." .. plugins_submodule, true)
+  for _, plugin in ipairs(plugins) do
+    table.insert(tbl, plugin)
+  end
+end
+
 local function setup()
-  local plugins = {
-    { "EdenEast/nightfox.nvim",
-      config = function()
-        require("nightfox").setup {
-          options = {
-            styles = {
-              comments = "",
-            },
-          },
-        }
-        vim.cmd("colorscheme duskfox")
-      end,
-    },
-  }
+  local plugins = {}
+  for _, submodule in ipairs {
+    "colors",
+    "ui",
+  } do
+    extend(plugins, submodule)
+  end
   local configs = setup_plugins(plugins)
   local missing = false
   for _, plugin in pairs(vim.g.plugs) do
@@ -105,7 +109,7 @@ else
   },
   function(code, signal)
     if code == 0 then
-      if vim.v.vim_did_enter == 0 then -- still during startup
+      if vim.v.vim_did_enter == 0 then -- still during startup, very unlikely
         vim.defer_fn(function()
           vim.api.nvim_create_autocmd("VimEnter", {
             callback = sync,
