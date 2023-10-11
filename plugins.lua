@@ -1,1 +1,1 @@
-require("plugins.pckr", true)
+require("plugins.plug", true)
