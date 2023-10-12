@@ -16,6 +16,7 @@ common.with_dependencies({ "make", "gcc" }, function()
       telescope.setup {
         defaults = {
           file_ignore_patterns = { ".git/" },
+          layout_strategy = "vertical",
         },
       }
 
