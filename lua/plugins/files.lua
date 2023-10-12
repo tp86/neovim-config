@@ -1,6 +1,8 @@
+vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 
 return {
+  { "kyazdani42/nvim-web-devicons" },
   {
     "kyazdani42/nvim-tree.lua",
     config = function()
@@ -24,6 +26,17 @@ return {
         },
         renderer = {
           highlight_opened_files = "name",
+          icons = {
+            glyphs = {
+              folder = {
+                -- requires nvim-web-devicons
+                default = "󰉋",
+                open = "󰝰",
+                empty = "󰉖",
+                empty_open = "󰷏",
+              }
+            }
+          }
         },
       }
       local nmap = require("common").map.n

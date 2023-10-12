@@ -112,6 +112,7 @@ end
 -- end of helpers }}}
 
 return {
+  { "kyazdani42/nvim-web-devicons" },
   {
     -- for git (branch & status) component
     "rktjmp/git-info.vim",
