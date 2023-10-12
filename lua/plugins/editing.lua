@@ -27,7 +27,7 @@ return {
       local ok, wk = pcall(require, "which-key")
       if ok then
         wk.register({
-          keys = "comment",
+          [keys] = "comment",
         }, { mode = "o" })
       end
     end,
