@@ -37,7 +37,7 @@ o.splitright = true
 
 o.showmode = false
 
-local common = require("common", true)
+local common = require("common")
 common.with_dependencies({ "rg" }, function()
   o.grepprg = "rg --line-number --column --with-filename"
   o.grepformat = "%f:%l:%c:%m"

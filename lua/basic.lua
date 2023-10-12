@@ -1,4 +1,4 @@
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
-vim.cmd [[ syntax on ]]
+--vim.cmd [[ syntax on ]]

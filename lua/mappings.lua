@@ -1,4 +1,4 @@
-local map = require("common", true).map
+local map = require("common").map
 
 -- probably to be removed
 map.n("<a-h>", "<c-w>h", "Go to the left window")
