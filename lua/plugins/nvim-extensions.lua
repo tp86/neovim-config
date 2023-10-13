@@ -94,13 +94,38 @@ local plugins = {
     config = function()
       local hop = require("hop")
       hop.setup()
-      local directions = require("hop.hint").HintDirection
-      local common = require("common")
       local map_opts = { remap = true }
-      common.map("f", function() hop.hint_char1 { direction = directions.AFTER_CURSOR } end, "Go to char forward", map_opts)
-      common.map("F", function() hop.hint_char1 { direction = directions.BEFORE_CURSOR } end, "Go to char backward", map_opts)
-      common.map("t", function() hop.hint_char1 { direction = directions.AFTER_CURSOR, hint_offset = -1} end, "Go till char forward", map_opts)
-      common.map("T", function() hop.hint_char1 { direction = directions.BEFORE_CURSOR, hint_offset = 1 } end, "Go till char backward", map_opts)
+      common.map("f", hop.hint_char1, "Go to char", map_opts)
+
+      local jump_target = require("hop.jump_target")
+      local generator = jump_target.jump_targets_by_scanning_lines
+      local function jump_with_dynamic_offset(jt)
+        local current_position = vim.api.nvim_win_get_cursor(0)
+        local current_line = current_position[1]
+        local current_column = current_position[2]
+        local target_line = jt.line + 1
+        local target_column = jt.column - 1
+        local hint_offset = 1
+        if current_line < target_line or (current_line == target_line and current_column < target_column) then
+          hint_offset = -1
+        end
+        hop.move_cursor_to(jt.window, target_line, target_column, hint_offset)
+      end
+      local function hop_bidirectional_till()
+        local c = hop.get_input_pattern("Till 1 char: ", 1)
+        if not c then
+          return
+        end
+
+        local hop_opts = hop.opts
+
+        hop.hint_with_callback(
+          generator(jump_target.regex_by_case_searching(c, true, hop_opts)),
+          hop_opts,
+          jump_with_dynamic_offset
+        )
+      end
+      common.map("t", hop_bidirectional_till, "Go till char", map_opts)
     end,
   },
 }
@@ -111,12 +136,12 @@ common.with_dependencies({ "gcc" }, function()
   table.insert(plugins, { "nvim-treesitter/nvim-treesitter-textobjects" })
   table.insert(plugins, {
     "nvim-treesitter/nvim-treesitter",
-    build = ":TSUpdateSync",
-    --[[
-    function()
-      require("nvim-treesitter.install").update { with_sync = true }
+    build = function()
+      local ok, install = pcall(require, "nvim-treesitter.install")
+      if ok then
+        install.update { with_sync = true }
+      end
     end,
-    --]]
     config = function()
       require("nvim-treesitter.configs").setup {
         ensure_installed = { "python", "lua", "janet_simple" },
