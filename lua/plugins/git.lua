@@ -38,6 +38,7 @@ return {
     config = function()
       local opts = {
         disable_commit_confirmation = true,
+        kind = "vsplit",
       }
       local ok = pcall(require, "diffview")
       if ok then

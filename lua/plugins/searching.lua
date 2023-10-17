@@ -27,7 +27,7 @@ common.with_dependencies({ "make", "gcc" }, function()
       end, common.warn("live_grep in telescope not supported due to: ripgrep not available"))
       common.map.n("sb", builtin.buffers, "Find buffers")
       common.map.n("sg", builtin.git_branches, "Find git branches")
-      common.map.n("sr", builtin.lsp_references, "Find references")
+      common.map.n("sr", function() builtin.lsp_references{ fname_width = 50, trim_text = true } end, "Find references")
 
       local ok, wk = pcall(require, "which-key")
       if ok then

@@ -132,7 +132,7 @@ local plugins = {
 
 common.with_dependencies({ "gcc" }, function()
   -- additional extensions for nvim-treesitter
-  table.insert(plugins, { "p00f/nvim-ts-rainbow" })
+  --table.insert(plugins, { "p00f/nvim-ts-rainbow" })
   table.insert(plugins, { "nvim-treesitter/nvim-treesitter-textobjects" })
   table.insert(plugins, {
     "nvim-treesitter/nvim-treesitter",
@@ -151,9 +151,9 @@ common.with_dependencies({ "gcc" }, function()
           enable = true,
           additional_vim_regex_highlighting = true,
         },
-        rainbow = {
+        --[[rainbow = {
           enable = true,
-        },
+        },--]]
         textobjects = {
           select = {
             enable = true,
@@ -191,6 +191,22 @@ common.with_dependencies({ "gcc" }, function()
       vim.opt.foldmethod = "expr"
       vim.opt.foldexpr = "nvim-treesitter#foldexpr()"
       vim.opt.foldenable = false
+    end,
+  })
+  table.insert(plugins, {
+    "HiPhish/rainbow-delimiters.nvim",
+    config = function()
+      require("rainbow-delimiters.setup").setup {
+        highlight = {
+          "RainbowDelimiterYellow",
+          "RainbowDelimiterBlue",
+          "RainbowDelimiterOrange",
+          "RainbowDelimiterGreen",
+          "RainbowDelimiterViolet",
+          "RainbowDelimiterCyan",
+          "RainbowDelimiterRed",
+        }
+      }
     end,
   })
 end, common.warn("nvim-treesitter is not installed due to: gcc not available"))
