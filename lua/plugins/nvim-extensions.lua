@@ -193,22 +193,6 @@ common.with_dependencies({ "gcc" }, function()
       vim.opt.foldenable = false
     end,
   })
-  table.insert(plugins, {
-    "HiPhish/rainbow-delimiters.nvim",
-    config = function()
-      require("rainbow-delimiters.setup").setup {
-        highlight = {
-          "RainbowDelimiterYellow",
-          "RainbowDelimiterBlue",
-          "RainbowDelimiterOrange",
-          "RainbowDelimiterGreen",
-          "RainbowDelimiterViolet",
-          "RainbowDelimiterCyan",
-          "RainbowDelimiterRed",
-        }
-      }
-    end,
-  })
 end, common.warn("nvim-treesitter is not installed due to: gcc not available"))
 
 return plugins

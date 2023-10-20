@@ -43,6 +43,7 @@ end
 -- custom filename (shortened, relative to cwd)
 local function filename()
   local bufname = vim.fn.bufname()
+  ---@diagnostic disable-next-line:redefined-local
   local filename = fnamemodify(bufname, ":t")
   if #filename == 0 then
     return "[No Name]"
@@ -66,7 +67,7 @@ local function filename()
   if relative_dir == "." then
     return filename
   else
-    return vim.fn.pathshorten(relative_dir .. "/" .. filename)
+    return vim.fn.pathshorten(relative_dir .. "/" .. filename, 5)
   end
 end
 -- custom modified flags

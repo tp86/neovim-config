@@ -92,3 +92,5 @@ local function insert_mode_put()
   return keys
 end
 map.i("<a-v>", insert_mode_put, "Paste in insert mode", expr_opts)
+
+map.n("<backspace>", "<c-6>", "Edit the alternate file")
