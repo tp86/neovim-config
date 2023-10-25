@@ -69,6 +69,8 @@ map.n("<a-O>", function() put_empty_lines(vim.v.count1, "above") end, "Insert em
 map.n("<a-o>", function() put_empty_lines(vim.v.count1, "below") end, "Insert empty line(s) below")
 
 map.t("<esc>", [[<c-\><c-n>]], "Normal mode")
+map.t("<c-b>", [[<c-\><c-n><c-b>]], "Scroll terminal up")
+map.t("<c-u>", [[<c-\><c-n><c-u>]], "Scroll terminal up by half screen")
 
 map.v("/", 'y/<c-r>"<cr>', "Search selection forward")
 map.v("g/", "/", "Search forward")

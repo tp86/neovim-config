@@ -88,6 +88,7 @@ local plugins = {
       }
     end,
   },
+  --[[
   {
     "phaazon/hop.nvim",
     branch = "v2",
@@ -126,6 +127,27 @@ local plugins = {
         )
       end
       common.map("t", hop_bidirectional_till, "Go till char", map_opts)
+    end,
+  },
+  ]]
+  {
+    "folke/flash.nvim",
+    config = function()
+      local flash = require("flash")
+      flash.setup {
+        highlight = {
+          backdrop = false,
+        },
+        modes = {
+          char = {
+            highlight = {
+              backdrop = false
+            }
+          }
+        }
+      }
+      local common = require("common")
+      common.map.n("<leader>j", flash.jump, "Flash jump")
     end,
   },
 }
