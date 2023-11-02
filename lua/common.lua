@@ -58,6 +58,24 @@ if ok then
   capabilities = cmp_nvim_lsp.default_capabilities(vim.lsp.protocol.make_client_capabilities())
 end
 
+local augroup_opts = { clear = true }
+-- register autocmds in augroup
+local function register_autocmds_group(group_name, cmds)
+  local group = vim.api.nvim_create_augroup(group_name, augroup_opts)
+  for _, cmd in ipairs(cmds) do
+    local events, opts = {}, {}
+    for key, value in pairs(cmd) do
+      if type(key) == "number" then -- event name
+        table.insert(events, value)
+      else -- autocmd option
+        opts[key] = value
+      end
+    end
+    opts = vim.tbl_extend("keep", { group = group }, opts)
+    vim.api.nvim_create_autocmd(events, opts)
+  end
+end
+
 return {
   with_dependencies = with_dependencies,
   warn = warn,
@@ -72,4 +90,5 @@ return {
     on_attach = on_attach,
     capabilities = capabilities,
   },
+  register_autocmds_group = register_autocmds_group,
 }
