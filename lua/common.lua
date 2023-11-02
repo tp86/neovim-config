@@ -39,17 +39,23 @@ local cmap = make_map("c")
 local map = make_map("")
 
 local function on_attach(_, bufnr)
+  ---@diagnostic disable-next-line:redefined-local
   local map_opts = {
     noremap = true,
     silent = true,
     buffer = bufnr,
   }
+  ---@diagnostic disable-next-line:redefined-local
+  local function map(keys, action, description)
+    return nmap(keys, action, description, map_opts)
+  end
   -- set mappings only if LSP is connected
-  nmap("gd", vim.lsp.buf.definition, "Go to definition", map_opts)
-  nmap("gr", vim.lsp.buf.references, "List references", map_opts)
-  nmap("K", vim.lsp.buf.hover, "Show documentation", map_opts)
-  nmap("<localleader>r", vim.lsp.buf.rename, "Rename symbol", map_opts)
-  nmap("<localleader>=", function() vim.lsp.buf.format { async = true } end, "Format document", map_opts)
+  map("gd", vim.lsp.buf.definition, "Go to definition")
+  map("gr", vim.lsp.buf.references, "List references")
+  map("K", vim.lsp.buf.hover, "Show documentation")
+  map("<localleader>r", vim.lsp.buf.rename, "Rename symbol")
+  map("<localleader>=", function() vim.lsp.buf.format { async = true } end, "Format document")
+  map("<localleader>a", vim.lsp.buf.code_action, "Code action")
 end
 
 local capabilities
