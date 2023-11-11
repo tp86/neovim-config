@@ -8,7 +8,14 @@ local plugins = {
         lookup_parents = true,   -- Lookup config files in parent directories
       }
     end
-  }
+  },
+  {
+    "jlcrochet/vim-crystal",
+    ["for"] = "crystal",
+    config = function()
+      vim.g.crystal_simple_indent = 1
+    end,
+  },
 }
 
 local common = require("common")
