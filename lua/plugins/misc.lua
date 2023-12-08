@@ -9,13 +9,6 @@ local plugins = {
       }
     end
   },
-  {
-    "jlcrochet/vim-crystal",
-    ["for"] = "crystal",
-    config = function()
-      vim.g.crystal_simple_indent = 1
-    end,
-  },
 }
 
 local common = require("common")
