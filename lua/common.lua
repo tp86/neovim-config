@@ -49,6 +49,7 @@ local function on_attach(_, bufnr)
   local function map(keys, action, description)
     return nmap(keys, action, description, map_opts)
   end
+
   -- set mappings only if LSP is connected
   map("gd", vim.lsp.buf.definition, "Go to definition")
   map("gr", vim.lsp.buf.references, "List references")
@@ -62,6 +63,17 @@ local capabilities
 local ok, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
 if ok then
   capabilities = cmp_nvim_lsp.default_capabilities(vim.lsp.protocol.make_client_capabilities())
+end
+
+local function setup_lsp(config_name, server_name)
+  server_name = server_name or config_name
+  with_dependencies({ server_name }, function()
+    local lspconfig = require("lspconfig")
+    lspconfig[config_name].setup {
+      on_attach = on_attach,
+      capabilities = capabilities,
+    }
+  end, warn(("%s not available"):format(server_name)))
 end
 
 local augroup_opts = { clear = true }
@@ -95,6 +107,7 @@ return {
   lsp = {
     on_attach = on_attach,
     capabilities = capabilities,
+    setup = setup_lsp,
   },
   register_autocmds_group = register_autocmds_group,
 }

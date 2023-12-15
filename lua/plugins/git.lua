@@ -47,4 +47,7 @@ return {
       require("neogit").setup(opts)
     end,
   },
+  {
+    "FabijanZulj/blame.nvim"
+  },
 }
