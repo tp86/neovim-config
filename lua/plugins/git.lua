@@ -38,7 +38,14 @@ return {
     config = function()
       local opts = {
         disable_commit_confirmation = true,
+        disable_insert_on_commit = true,
         kind = "vsplit",
+        status = {
+          kind = "vsplit",
+        },
+        commit_editor = {
+          kind = "split",
+        },
       }
       local ok = pcall(require, "diffview")
       if ok then
