@@ -143,8 +143,11 @@ local plugins = {
             highlight = {
               backdrop = false
             }
-          }
-        }
+          },
+          search = {
+            enabled = false,
+          },
+        },
       }
       local common = require("common")
       common.map.n("<leader>j", flash.jump, "Flash jump")
