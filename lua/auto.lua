@@ -144,3 +144,14 @@ register_autocmds_group("QuickfixOpenAfterGrep", {
     command = "copen",
   },
 })
+
+vim.diagnostic.config {
+  virtual_text = false,
+}
+o.updatetime = 2000
+register_autocmds_group("ShowDiagnostics", {
+  {
+    "CursorHold",
+    callback = vim.diagnostic.open_float,
+  },
+})
