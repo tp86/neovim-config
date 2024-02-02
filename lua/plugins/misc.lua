@@ -7,6 +7,14 @@ local plugins = {
         silent = false,           -- Disable plugin messages (Config loaded/ignored)
         lookup_parents = true,   -- Lookup config files in parent directories
       }
+      local common = require("common")
+      common.register_autocmds_group("ConfigLocalReload", {
+        {
+          "User",
+          pattern = "ConfigLocalFinished",
+          command = "silent! edit",
+        }
+      })
     end
   },
 }
