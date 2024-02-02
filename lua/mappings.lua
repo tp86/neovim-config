@@ -68,6 +68,7 @@ end
 map.n("<a-O>", function() put_empty_lines(vim.v.count1, "above") end, "Insert empty line(s) above")
 map.n("<a-o>", function() put_empty_lines(vim.v.count1, "below") end, "Insert empty line(s) below")
 
+map.n("<a-t>", ":sp|term<cr>", "Open terminal")
 map.t("<esc>", [[<c-\><c-n>]], "Normal mode")
 map.t("<c-b>", [[<c-\><c-n><c-b>]], "Scroll terminal up")
 map.t("<c-u>", [[<c-\><c-n><c-u>]], "Scroll terminal up by half screen")
