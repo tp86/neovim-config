@@ -19,6 +19,12 @@ map.t("<a-j>", [[<c-\><c-n><c-w>j]], "Go to the down window")
 map.t("<a-k>", [[<c-\><c-n><c-w>k]], "Go to the up window")
 map.t("<a-l>", [[<c-\><c-n><c-w>l]], "Go to the right window")
 
+-- resize windows
+map.n("<a-s-h>", "<cmd>silent vertical resize -3<cr>", "Decrease window width by 3")
+map.n("<a-s-j>", "<cmd>silent resize +3<cr>", "Increase window height by 3")
+map.n("<a-s-k>", "<cmd>silent resize -3<cr>", "Decrease window height by 3")
+map.n("<a-s-l>", "<cmd>silent vertical resize +3<cr>", "Increase window width by 3")
+
 map.i("<c-j>", "<c-n>", "Find next match")
 map.i("<c-k>", "<c-p>", "Find previous match")
 
