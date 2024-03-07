@@ -12,7 +12,10 @@ local plugins = {
         {
           "User",
           pattern = "ConfigLocalFinished",
-          command = "silent! edit",
+          -- command = "silent! edit",
+          callback = function()
+            vim.api.nvim_buf_set_option(0, 'filetype', vim.api.nvim_buf_get_option(0, 'filetype'))
+          end,
         }
       })
     end
