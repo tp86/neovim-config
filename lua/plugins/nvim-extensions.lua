@@ -153,6 +153,38 @@ local plugins = {
       common.map.n("<leader>j", flash.jump, "Flash jump")
     end,
   },
+  {
+    "mfussenegger/nvim-dap",
+    config = function()
+      vim.fn.sign_define("DapBreakpoint", { text = '⏺', texthl = '', linehl = '', numhl = '' })
+      vim.fn.sign_define("DapStopped", { text = '▶', texthl = '', linehl = '', numhl = '' })
+      local nmap = require("common").map.n
+      local dap = require("dap")
+      nmap("<F9>", dap.continue)
+      nmap("<F10>", dap.step_over)
+      nmap("<F11>", dap.step_into)
+      nmap("<F12>", dap.step_out)
+      nmap("<localleader>b", dap.toggle_breakpoint)
+    end,
+  },
+  {
+    "rcarriga/nvim-dap-ui",
+    config = function()
+      local dap = require("dap")
+      local dapui = require("dapui")
+      dapui.setup {}
+      dap.listeners.after.launch.dapui_config = dapui.open
+      dap.listeners.after.attach.dapui_config = dapui.open
+      dap.listeners.before.event_terminated.dapui_config = dapui.close
+      dap.listeners.before.event_exited.dapui_config = dapui.close
+    end,
+  },
+  {
+    "leoluz/nvim-dap-go",
+    config = function()
+      require("dap-go").setup {}
+    end,
+  }
 }
 
 common.with_dependencies({ "gcc" }, function()

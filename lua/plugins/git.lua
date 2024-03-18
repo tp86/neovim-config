@@ -13,7 +13,7 @@ return {
         on_attach = function(bufnr)
           local common = require("common")
           common.map.n("<localleader>h", gitsigns.preview_hunk, "Preview git hunk")
-          common.map.n("<localleader>b", gitsigns.blame_line, "Blame line")
+          common.map.n("<localleader>gb", gitsigns.blame_line, "Blame line")
         end,
         current_line_blame = true,
       }
