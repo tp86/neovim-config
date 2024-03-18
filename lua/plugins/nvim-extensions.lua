@@ -33,13 +33,18 @@ local plugins = {
       require("luasnip.loaders.from_vscode").lazy_load()
     end,
   },
+  { "rcarriga/cmp-dap" },
   {
     "hrsh7th/nvim-cmp",
     config = function()
       vim.opt.completeopt = { "menu", "menuone", "noselect" }
       local cmp = require("cmp")
       local luasnip = require("luasnip")
+      local dap = require("cmp_dap")
       cmp.setup {
+        enabled = function()
+          return vim.api.nvim_buf_get_option(0, "buftype") ~= "prompt" or (dap and dap.is_dap_buffer())
+        end,
         snippet = {
           expand = function(args)
             luasnip.lsp_expand(args.body)
@@ -85,6 +90,11 @@ local plugins = {
           ["<c-d>"] = cmp.mapping.scroll_docs(4),
           ["<c-e>"] = cmp.mapping.abort(),
         },
+        cmp.setup.filetype({"dap-repl", "dapui_watches", "dapui_hover"}, {
+          sources = {
+            { name = "dap" },
+          }
+        })
       }
     end,
   },
