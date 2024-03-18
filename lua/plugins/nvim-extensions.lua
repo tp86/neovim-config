@@ -260,6 +260,15 @@ common.with_dependencies({ "gcc" }, function()
       vim.opt.foldenable = false
     end,
   })
+  table.insert(plugins, {
+    "theHamsta/nvim-dap-virtual-text",
+    config = function()
+      require("nvim-dap-virtual-text").setup {
+        enabled_commands = false,
+
+      }
+    end,
+  })
 end, common.warn("nvim-treesitter is not installed due to: gcc not available"))
 
 return plugins
