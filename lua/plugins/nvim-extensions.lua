@@ -170,11 +170,13 @@ local plugins = {
       vim.fn.sign_define("DapStopped", { text = '▶', texthl = '', linehl = '', numhl = '' })
       local nmap = require("common").map.n
       local dap = require("dap")
-      nmap("<a-7>", dap.continue)
-      nmap("<a-8>", dap.step_over)
-      nmap("<a-9>", dap.step_into)
-      nmap("<a-0>", dap.step_out)
-      nmap("<localleader>b", dap.toggle_breakpoint)
+      nmap("<a-7>", dap.continue, "Debug: continue")
+      nmap("<a-8>", dap.step_over, "Debug: step over")
+      nmap("<a-9>", dap.step_into, "Debug: step into")
+      nmap("<a-0>", dap.step_out, "Debug: step out")
+      nmap("<localleader>b", dap.toggle_breakpoint, "Toggle debug breakpoint")
+      nmap("<localleader>B", dap.clear_breakpoints, "Delete all breakpoints")
+      nmap("<localleader><a-->", dap.terminate, "Debug: terminate")
     end,
   },
   {

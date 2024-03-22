@@ -1,3 +1,7 @@
+local ok, wk = pcall(require, "which-key")
+if ok then
+  wk.register { ["<localleader>g"] = { name = "+Git" } }
+end
 return {
   {
     "lewis6991/gitsigns.nvim",
@@ -12,7 +16,7 @@ return {
         },
         on_attach = function(bufnr)
           local common = require("common")
-          common.map.n("<localleader>h", gitsigns.preview_hunk, "Preview git hunk")
+          common.map.n("<localleader>gh", gitsigns.preview_hunk, "Preview git hunk")
           common.map.n("<localleader>gb", gitsigns.blame_line, "Blame line")
         end,
         current_line_blame = true,
@@ -52,7 +56,10 @@ return {
       if ok then
         opts.integrations = { diffview = true }
       end
-      require("neogit").setup(opts)
+      local neogit = require("neogit")
+      neogit.setup(opts)
+      local common = require("common")
+      common.map.n("<localleader>gg", neogit.open, "Open Neogit window")
     end,
   },
   {
