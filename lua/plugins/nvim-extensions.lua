@@ -180,6 +180,9 @@ local plugins = {
     end,
   },
   {
+    "nvim-neotest/nvim-nio",
+  },
+  {
     "rcarriga/nvim-dap-ui",
     config = function()
       local dap = require("dap")
