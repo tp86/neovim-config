@@ -166,7 +166,7 @@ local plugins = {
   {
     "mfussenegger/nvim-dap",
     config = function()
-      vim.fn.sign_define("DapBreakpoint", { text = '⏺', texthl = '', linehl = '', numhl = '' })
+      vim.fn.sign_define("DapBreakpoint", { text = '●', texthl = 'Error', linehl = '', numhl = '' })
       vim.fn.sign_define("DapStopped", { text = '▶', texthl = '', linehl = '', numhl = '' })
       local nmap = require("common").map.n
       local dap = require("dap")

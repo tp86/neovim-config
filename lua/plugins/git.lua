@@ -18,6 +18,8 @@ return {
           local common = require("common")
           common.map.n("<localleader>gh", gitsigns.preview_hunk, "Preview git hunk")
           common.map.n("<localleader>gb", gitsigns.blame_line, "Blame line")
+          common.map.n("]h", gitsigns.next_hunk, "Go to next git hunk")
+          common.map.n("[h", gitsigns.prev_hunk, "Go to previous git hunk")
         end,
         current_line_blame = true,
       }

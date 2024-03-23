@@ -1,4 +1,8 @@
-local highlight_excluded_filetypes = { "help", "NvimTree" }
+local highlight_excluded_filetypes = { "help", "NvimTree", "dap-repl" }
+local function exclude_highlighting(filetype)
+  return vim.tbl_contains(highlight_excluded_filetypes, filetype)
+      or filetype:match("^dapui_")
+end
 local colorcolumn_inactive = {}
 for i = 1, 999 do colorcolumn_inactive[i] = i end
 
@@ -13,7 +17,7 @@ local function sync_dynamic_option(opt_name, is_bool)
       dynamic_options[opt_name] = true
     else
       local msg = ('"Value for boolean option %s expected to be 0 or 1, got %s"')
-      :format(opt_name, new_value)
+          :format(opt_name, new_value)
       vim.cmd('echoerr ' .. msg)
     end
   end
@@ -35,9 +39,12 @@ local register_autocmds_group = require("common").register_autocmds_group
 -- colorcolumn in active window, colorize all columns in inactive window
 register_autocmds_group("ColorColumn", {
   {
-    "BufNewFile", "BufRead", "BufWinEnter", "WinEnter",
+    "BufNewFile",
+    "BufRead",
+    "BufWinEnter",
+    "WinEnter",
     callback = function()
-      if not vim.tbl_contains(highlight_excluded_filetypes, vim.o.filetype) then
+      if not exclude_highlighting(vim.o.filetype) then
         ol.colorcolumn = dynamic_options.colorcolumn
       else
         ol.colorcolumn = {}
@@ -47,7 +54,7 @@ register_autocmds_group("ColorColumn", {
   {
     "WinLeave",
     callback = function()
-      if not vim.tbl_contains(highlight_excluded_filetypes, vim.o.filetype) then
+      if not exclude_highlighting(vim.o.filetype) then
         ol.colorcolumn = colorcolumn_inactive
       end
     end,
@@ -85,14 +92,18 @@ register_autocmds_group("TerminalSettings", {
     end,
   },
   {
-    "TermOpen", "BufEnter", "WinEnter",
+    "TermOpen",
+    "BufEnter",
+    "WinEnter",
     pattern = "term://*",
     callback = function()
       ol.sidescrolloff = 0
     end,
   },
   {
-    "TermLeave", "BufLeave", "WinLeave",
+    "TermLeave",
+    "BufLeave",
+    "WinLeave",
     pattern = "term://*",
     command = "stopinsert",
   },
