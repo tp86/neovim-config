@@ -1,4 +1,4 @@
-local highlight_excluded_filetypes = { "help" }
+local highlight_excluded_filetypes = { "help", "NvimTree" }
 local colorcolumn_inactive = {}
 for i = 1, 999 do colorcolumn_inactive[i] = i end
 
@@ -47,7 +47,9 @@ register_autocmds_group("ColorColumn", {
   {
     "WinLeave",
     callback = function()
-      ol.colorcolumn = colorcolumn_inactive
+      if not vim.tbl_contains(highlight_excluded_filetypes, vim.o.filetype) then
+        ol.colorcolumn = colorcolumn_inactive
+      end
     end,
   },
   sync_dynamic_option("colorcolumn"),
