@@ -53,6 +53,7 @@ local function on_attach(_, bufnr)
   -- set mappings only if LSP is connected
   map("gd", vim.lsp.buf.definition, "Go to definition")
   map("gr", vim.lsp.buf.references, "List references")
+  map("gi", vim.lsp.buf.implementation, "List implementations")
   map("K", vim.lsp.buf.hover, "Show documentation")
   map("<localleader>r", vim.lsp.buf.rename, "Rename symbol")
   map("<localleader>=", function() vim.lsp.buf.format { async = true } end, "Format document")
