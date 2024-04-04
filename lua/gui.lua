@@ -20,11 +20,11 @@ register_autocmds_group("GuiConfig", {
     "DirChanged",
     pattern = "global",
     callback = function(ev)
-      vim.opt.titlestring = ev.file
+      vim.opt.titlestring = vim.fn.pathshorten(ev.file)
     end,
   }
 })
 
 vim.g.guifont = "Hack:h14"
 vim.opt.title = true
-vim.opt.titlestring = vim.fn.getenv("PWD")
+vim.opt.titlestring = vim.fn.pathshorten(vim.fn.getenv("PWD"))
