@@ -121,76 +121,88 @@ return {
   {
     "nvim-lualine/lualine.nvim",
     config = function()
-      require("lualine").setup {
-        sections = {
-          lualine_a = {
-            {
-              short_cwd,
-              on_click = function()
-                pcall(vim.cmd, "NvimTreeOpen")
-              end,
+      local function setup()
+        require("lualine", true).setup {
+          sections = {
+            lualine_a = {
+              {
+                short_cwd,
+                on_click = function()
+                  pcall(vim.cmd, "NvimTreeOpen")
+                end,
+              },
+            },
+            lualine_b = {
+              {
+                "branch",
+                fmt = branch_fmt,
+                cond = flip(is_terminal),
+                on_click = function()
+                  local ok, telescope = pcall(require, "telescope.builtin")
+                  if ok then
+                    telescope.git_branches()
+                  end
+                end,
+              },
+            },
+            lualine_c = {
+              {
+                filename,
+                separator = {},
+                cond = flip(filetype_in { "NvimTree", "DiffviewFiles" }),
+              },
+              {
+                flags,
+                cond = flip(any {
+                  filetype_in { "NvimTree", "DiffviewFiles", "NeogitStatus" },
+                  is_terminal,
+                }),
+              },
+            },
+            lualine_x = {
+              {
+                "filetype",
+                cond = flip(filetype_in { "NvimTree", "DiffviewFiles", "NeogitStatus" }),
+              },
+              {
+                virtualenv,
+                cond = filetype_in { "python" },
+              },
+              {
+                lsp_clients,
+              },
+            },
+            lualine_y = {
+              {
+                "diagnostics",
+                icons_enabled = false,
+                on_click = function()
+                  vim.diagnostic.setloclist()
+                end,
+              },
+            },
+            lualine_z = {},
+          },
+          tabline = {
+            lualine_a = {
+              "tabs",
             },
           },
-          lualine_b = {
-            {
-              "branch",
-              fmt = branch_fmt,
-              cond = flip(is_terminal),
-              on_click = function()
-                local ok, telescope = pcall(require, "telescope.builtin")
-                if ok then
-                  telescope.git_branches()
-                end
-              end,
-            },
-          },
-          lualine_c = {
-            {
-              filename,
-              separator = {},
-              cond = flip(filetype_in { "NvimTree", "DiffviewFiles" }),
-            },
-            {
-              flags,
-              cond = flip(any {
-                filetype_in { "NvimTree", "DiffviewFiles", "NeogitStatus" },
-                is_terminal,
-              }),
-            },
-          },
-          lualine_x = {
-            {
-              "filetype",
-              cond = flip(filetype_in { "NvimTree", "DiffviewFiles", "NeogitStatus" }),
-            },
-            {
-              virtualenv,
-              cond = filetype_in { "python" },
-            },
-            {
-              lsp_clients,
-            },
-          },
-          lualine_y = {
-            {
-              "diagnostics",
-              icons_enabled = false,
-              on_click = function()
-                vim.diagnostic.setloclist()
-              end,
-            },
-          },
-          lualine_z = {},
-        },
-        tabline = {
-          lualine_a = {
-            "tabs",
-          },
-        },
-      }
+        }
+      end
+      setup()
 
       -- show tabline only when there are multiple tabs
       vim.opt.showtabline = 1
+
+      -- reload on colorscheme change
+      local common = require("common")
+      common.register_autocmds_group("ColorSchemeChange", {
+        {
+          "ColorScheme",
+          callback = setup,
+        },
+      })
     end,
   },
 }
