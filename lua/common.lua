@@ -96,6 +96,28 @@ local function register_autocmds_group(group_name, cmds)
   end
 end
 
+local function config_local_colorscheme(colorscheme_name)
+  local config_local_filename = require("config-local").lookup()
+  if vim.g.config_local_loaded ~= config_local_filename then
+    vim.g.colors_name_previous = vim.g.colors_name
+  end
+  vim.g.config_local_loaded = config_local_filename
+  vim.cmd.colorscheme(colorscheme_name)
+  register_autocmds_group("ConfigLocalLeaveDir", {
+    {
+      "DirChangedPre",
+      pattern = "global",
+      callback = function(event)
+        if vim.fn.isdirectory(vim.fn.expand(event.file)) ~= 0 then
+          vim.cmd.colorscheme(vim.g.colors_name_previous)
+          vim.api.nvim_del_augroup_by_name("ConfigLocalLeaveDir")
+        end
+      end,
+      nested = true,
+    }
+  })
+end
+
 return {
   with_dependencies = with_dependencies,
   warn = warn,
@@ -112,4 +134,5 @@ return {
     setup = setup_lsp,
   },
   register_autocmds_group = register_autocmds_group,
+  config_local_colorscheme = config_local_colorscheme,
 }
