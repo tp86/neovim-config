@@ -1,5 +1,6 @@
 .netrwhist
 autoload/plug.vim
+autoload/plug.vim.old
 /plugged/
 /sessions/
 /pynvim/
