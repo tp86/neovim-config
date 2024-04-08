@@ -39,4 +39,7 @@ return {
       }
     end,
   },
+  function()
+    vim.cmd.colorscheme("duskfox")
+  end,
 }

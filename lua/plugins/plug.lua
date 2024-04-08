@@ -46,24 +46,28 @@ local function register_plugins(plugins)
   local start_configs = {}
   vim.call("plug#begin")
   for _, plugin in ipairs(plugins) do
-    local repo = plugin[1]
-    local opts = get_options(plugin)
-    if next(opts) then
-      plug(repo, opts)
+    if type(plugin) == "function" then
+      table.insert(start_configs, plugin)
     else
-      plug(repo)
-    end
-    local config = plugin.config
-    if type(config) == "function" then
-      local name = plugin.as or get_name(plugin)
-      if is_lazy(plugin) then
-        vim.api.nvim_create_autocmd("User", {
-          pattern = name,
-          callback = config,
-          once = true,
-        })
+      local repo = plugin[1]
+      local opts = get_options(plugin)
+      if next(opts) then
+        plug(repo, opts)
       else
-        table.insert(start_configs, config)
+        plug(repo)
+      end
+      local config = plugin.config
+      if type(config) == "function" then
+        local name = plugin.as or get_name(plugin)
+        if is_lazy(plugin) then
+          vim.api.nvim_create_autocmd("User", {
+            pattern = name,
+            callback = config,
+            once = true,
+          })
+        else
+          table.insert(start_configs, config)
+        end
       end
     end
   end
@@ -117,21 +121,22 @@ if fs_stat(plug_file) then
   sync()
 else
   vim.loop.spawn("curl", {
-    args = { "--create-dirs", "-fLo", plug_file, "https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim"},
-  },
-  function(code, signal)
-    if code == 0 then
-      if vim.v.vim_did_enter == 0 then -- still during startup, very unlikely
-        vim.defer_fn(function()
-          vim.api.nvim_create_autocmd("VimEnter", {
-            callback = sync,
-          })
-        end, 0)
-      else
-        vim.defer_fn(function()
-          sync()
-        end, 0)
+      args = { "--create-dirs", "-fLo", plug_file, "https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim" },
+    },
+    function(code, signal)
+      if code == 0 then
+        if vim.v.vim_did_enter == 0 then -- still during startup, very unlikely
+          vim.defer_fn(function()
+            vim.api.nvim_create_autocmd("VimEnter", {
+              callback = sync,
+            })
+          end, 0)
+        else
+          vim.defer_fn(function()
+            sync()
+          end, 0)
+        end
       end
     end
-  end)
+  )
 end

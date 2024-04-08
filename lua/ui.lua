@@ -28,5 +28,3 @@ register_autocmds_group("GuiConfig", {
 vim.g.guifont = "Hack:h14"
 vim.opt.title = true
 vim.opt.titlestring = vim.fn.pathshorten(vim.fn.getenv("PWD"))
-
-vim.cmd.colorscheme("duskfox")
