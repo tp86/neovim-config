@@ -14,7 +14,13 @@ return {
   {
     "projekt0n/github-nvim-theme",
     config = function()
-      require("github-theme").setup {}
+      require("github-theme").setup {
+        options = {
+          styles = {
+            comments = "NONE",
+          },
+        },
+      }
     end,
   },
   {

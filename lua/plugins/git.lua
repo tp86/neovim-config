@@ -23,6 +23,25 @@ return {
         end,
         current_line_blame = true,
       }
+      local register_autocmds_group = require("common").register_autocmds_group
+      local function colorssetup()
+        local function inttocolorstring(n)
+          return "#" .. string.format("%06x", n)
+        end
+        local current_line_blame_hl_name = "GitSignsCurrentLineBlame"
+        local opts = {
+          italic = true,
+          fg = inttocolorstring(vim.api.nvim_get_hl(0, {name="NonText"}).fg)
+        }
+        vim.api.nvim_set_hl(0, current_line_blame_hl_name, opts)
+      end
+      colorssetup()
+      register_autocmds_group("GitSignsCurrentLineBlameCustomize", {
+        {
+          "ColorScheme",
+          callback = colorssetup,
+        },
+      })
     end,
   },
   -- dependency for diffview and neogit
