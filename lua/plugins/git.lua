@@ -60,7 +60,8 @@ return {
     end,
   },
   {
-    "TimUntersberger/neogit",
+    "NeogitOrg/neogit",
+    on = "Neogit",
     config = function()
       local opts = {
         disable_commit_confirmation = true,
