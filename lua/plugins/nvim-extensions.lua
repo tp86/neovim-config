@@ -26,30 +26,27 @@ local plugins = {
   -- additional extensions for nvim-cmp
   { "hrsh7th/cmp-buffer" },
   { "hrsh7th/cmp-nvim-lsp" },
-  {
-    "saadparwaiz1/cmp_luasnip",
-    config = function()
-      require("cmp_luasnip").clear_cache()
-    end,
-  },
-  {
-    "L3MON4D3/LuaSnip",
-    config = function()
-      -- hard cleanup
-      for name in pairs(package.loaded) do
-        if name:match("^luasnip") then
-          package.loaded[name] = nil
-        end
-      end
-      require("luasnip.loaders.from_snipmate").lazy_load()
-    end,
-  },
   { "rcarriga/cmp-dap" },
+  function()
+    -- unregister duplicated old sources
+    local cmp = require("cmp")
+    local sources = {}
+    for _, cfg in pairs(cmp.core.sources) do
+      local source = sources[cfg.name] or {}
+      table.insert(source, cfg.id)
+      sources[cfg.name] = source
+    end
+    for _, ids in pairs(sources) do
+      for i = 1, #ids - 1 do
+        cmp.unregister_source(ids[i])
+      end
+    end
+  end,
   {
     "hrsh7th/nvim-cmp",
     config = function()
       vim.opt.completeopt = { "menu", "menuone", "noselect" }
-      local cmp = require("cmp", true)
+      local cmp = require("cmp")
       local luasnip = require("luasnip")
       local dap = require("cmp_dap")
       cmp.setup {
@@ -61,10 +58,10 @@ local plugins = {
             luasnip.lsp_expand(args.body)
           end,
         },
-        sources = cmp.config.sources {
+        sources = {
           { name = "nvim_lsp", keyword_length = 2 },
-          { name = "buffer", keyword_length = 3 },
-          { name = "luasnip", keyword_length = 2 },
+          { name = "luasnip",  keyword_length = 2 },
+          { name = "buffer",   keyword_length = 3 },
         },
         mapping = cmp.mapping.preset.insert {
           ["<c-j>"] = cmp.mapping(function()
@@ -107,6 +104,13 @@ local plugins = {
           { name = "dap" },
         }
       })
+    end,
+  },
+  { "saadparwaiz1/cmp_luasnip" },
+  {
+    "L3MON4D3/LuaSnip",
+    config = function()
+      require("luasnip.loaders.from_snipmate").lazy_load()
     end,
   },
   --[[

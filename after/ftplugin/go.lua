@@ -7,7 +7,6 @@ register_autocmds_group("GoFmt", {
     "BufWritePre",
     pattern = "*.go",
     callback = function()
-      print("formatting")
       vim.lsp.buf.format()
     end,
   }
