@@ -98,7 +98,7 @@ local function get_configs()
     extend(plugins, submodule)
   end
   for _, extra_submodule in ipairs(extra_plugins_submodules) do
-    print(vim.inspect(pcall(extend, plugins, extra_submodule)))
+    pcall(extend, plugins, extra_submodule)
   end
   return register_plugins(plugins)
 end

@@ -26,11 +26,22 @@ local plugins = {
   -- additional extensions for nvim-cmp
   { "hrsh7th/cmp-buffer" },
   { "hrsh7th/cmp-nvim-lsp" },
-  { "saadparwaiz1/cmp_luasnip" },
+  {
+    "saadparwaiz1/cmp_luasnip",
+    config = function()
+      require("cmp_luasnip").clear_cache()
+    end,
+  },
   {
     "L3MON4D3/LuaSnip",
     config = function()
-      require("luasnip.loaders.from_vscode").lazy_load()
+      -- hard cleanup
+      for name in pairs(package.loaded) do
+        if name:match("^luasnip") then
+          package.loaded[name] = nil
+        end
+      end
+      require("luasnip.loaders.from_snipmate").lazy_load()
     end,
   },
   { "rcarriga/cmp-dap" },
@@ -38,7 +49,7 @@ local plugins = {
     "hrsh7th/nvim-cmp",
     config = function()
       vim.opt.completeopt = { "menu", "menuone", "noselect" }
-      local cmp = require("cmp")
+      local cmp = require("cmp", true)
       local luasnip = require("luasnip")
       local dap = require("cmp_dap")
       cmp.setup {
@@ -90,12 +101,12 @@ local plugins = {
           ["<c-d>"] = cmp.mapping.scroll_docs(4),
           ["<c-e>"] = cmp.mapping.abort(),
         },
-        cmp.setup.filetype({"dap-repl", "dapui_watches", "dapui_hover"}, {
-          sources = {
-            { name = "dap" },
-          }
-        })
       }
+      cmp.setup.filetype({ "dap-repl", "dapui_watches", "dapui_hover" }, {
+        sources = {
+          { name = "dap" },
+        }
+      })
     end,
   },
   --[[
