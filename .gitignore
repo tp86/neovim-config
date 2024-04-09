@@ -4,3 +4,4 @@ autoload/plug.vim.old
 /plugged/
 /sessions/
 /pynvim/
+**/plugins/extra.lua

@@ -12,6 +12,10 @@ local plugins_submodules = {
   "syntax",
   "misc",
 }
+-- extra plugins are environment-specific and their submodules may not exist
+local extra_plugins_submodules = {
+  "extra",
+}
 
 local translate_key = setmetatable({
   build = "do",
@@ -92,6 +96,9 @@ local function get_configs()
   local plugins = {}
   for _, submodule in ipairs(plugins_submodules) do
     extend(plugins, submodule)
+  end
+  for _, extra_submodule in ipairs(extra_plugins_submodules) do
+    print(vim.inspect(pcall(extend, plugins, extra_submodule)))
   end
   return register_plugins(plugins)
 end
