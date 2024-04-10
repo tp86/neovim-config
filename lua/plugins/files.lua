@@ -5,8 +5,6 @@ return {
   {
     -- requires PATCHED font (downloaded raw from repo, not from releases)
     "nvim-tree/nvim-web-devicons",
-    -- limit commit until https://github.com/nvim-tree/nvim-web-devicons/issues/440 is fixed
-    commit = "20921d33c605ba24c8d0b76b379a54a9c83ba170",
   },
   {
     "nvim-tree/nvim-tree.lua",
