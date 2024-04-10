@@ -60,6 +60,10 @@ local function register_plugins(plugins)
       else
         plug(repo)
       end
+      local config_before = plugin.config_before
+      if type(config_before) == "function" then
+        config_before()
+      end
       local config = plugin.config
       if type(config) == "function" then
         local name = plugin.as or get_name(plugin)
