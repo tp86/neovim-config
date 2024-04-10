@@ -32,6 +32,11 @@ local plugins = {
     config = function()
       require("luasnip").cleanup()
       require("luasnip.loaders.from_snipmate").lazy_load()
+      common.map.i("<esc>", function()
+        require("luasnip").unlink_current()
+        -- TODO try to refer to existing key
+        vim.cmd.stopinsert()
+      end, "Clear snippet jump history on leaving insert mode")
     end,
   },
   { "saadparwaiz1/cmp_luasnip" },
@@ -68,8 +73,8 @@ local plugins = {
         },
         sources = {
           { name = "nvim_lsp", keyword_length = 2 },
-          { name = "luasnip",  keyword_length = 2 },
-          { name = "buffer",   keyword_length = 3 },
+          { name = "luasnip", keyword_length = 2 },
+          { name = "buffer", keyword_length = 3 },
         },
         mapping = cmp.mapping.preset.insert {
           ["<c-j>"] = cmp.mapping(function()
@@ -87,7 +92,7 @@ local plugins = {
             end
           end, { "i", "s" }),
           ["<c-h>"] = cmp.mapping(function(fallback)
-            if luasnip.jumpable(-1) then
+            if luasnip.locally_jumpable(-1) then
               luasnip.jump(-1)
             else
               fallback()
