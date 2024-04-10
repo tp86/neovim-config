@@ -27,6 +27,14 @@ local plugins = {
   { "hrsh7th/cmp-buffer" },
   { "hrsh7th/cmp-nvim-lsp" },
   { "rcarriga/cmp-dap" },
+  {
+    "L3MON4D3/LuaSnip",
+    config = function()
+      require("luasnip").cleanup()
+      require("luasnip.loaders.from_snipmate").lazy_load()
+    end,
+  },
+  { "saadparwaiz1/cmp_luasnip" },
   function()
     -- unregister duplicated old sources
     local cmp = require("cmp")
@@ -104,13 +112,6 @@ local plugins = {
           { name = "dap" },
         }
       })
-    end,
-  },
-  { "saadparwaiz1/cmp_luasnip" },
-  {
-    "L3MON4D3/LuaSnip",
-    config = function()
-      require("luasnip.loaders.from_snipmate").lazy_load()
     end,
   },
   --[[
