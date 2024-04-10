@@ -33,10 +33,10 @@ end
 
 local nmap = make_map("n")
 local imap = make_map("i")
-local vmap = make_map("v")
+local vmap = make_map("x")
 local tmap = make_map("t")
 local cmap = make_map("c")
-local map = make_map("")
+local map = make_map({"n", "x", "o"})
 
 local function on_attach(_, bufnr)
   ---@diagnostic disable-next-line:redefined-local
