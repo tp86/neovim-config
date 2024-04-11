@@ -2,10 +2,7 @@ vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 
 return {
-  {
-    -- requires PATCHED font (downloaded raw from repo, not from releases)
-    "nvim-tree/nvim-web-devicons",
-  },
+  require("plugins.common")["web-devicons"],
   {
     "nvim-tree/nvim-tree.lua",
     config = function()
