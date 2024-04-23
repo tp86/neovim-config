@@ -22,6 +22,7 @@ return {
           common.map.n("[h", gitsigns.prev_hunk, "Go to previous git hunk")
         end,
         current_line_blame = true,
+        current_line_blame_formatter = " <author>, <author_time:%Y-%m-%d> - <summary>"
       }
       local register_autocmds_group = require("common").register_autocmds_group
       local function colorssetup()
