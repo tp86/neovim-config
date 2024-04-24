@@ -40,6 +40,6 @@ return {
     end,
   },
   function()
-    vim.cmd.colorscheme("github_light_default")
+    vim.cmd.colorscheme("duskfox")
   end,
 }

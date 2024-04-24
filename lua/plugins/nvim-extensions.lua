@@ -40,8 +40,9 @@ local plugins = {
     end,
   },
   { "saadparwaiz1/cmp_luasnip" },
+  { "onsails/lspkind.nvim" },
   function()
-    -- unregister duplicated old sources
+    -- unregister duplicated old sources on config resourcing
     local cmp = require("cmp")
     local sources = {}
     for _, cfg in pairs(cmp.core.sources) do
@@ -62,10 +63,22 @@ local plugins = {
       local cmp = require("cmp")
       local luasnip = require("luasnip")
       local dap = require("cmp_dap")
+      local lspkind = require("lspkind")
       cmp.setup {
         enabled = function()
           return vim.api.nvim_buf_get_option(0, "buftype") ~= "prompt" or (dap and dap.is_dap_buffer())
         end,
+        formatting = {
+          format = lspkind.cmp_format {
+            mode = "symbol_text",
+            menu = {
+              buffer = "[buf]",
+              nvim_lsp = "[LSP]",
+              luasnip = "[snip]",
+
+            },
+          },
+        },
         snippet = {
           expand = function(args)
             luasnip.lsp_expand(args.body)
@@ -73,8 +86,8 @@ local plugins = {
         },
         sources = {
           { name = "nvim_lsp", keyword_length = 2 },
-          { name = "luasnip", keyword_length = 2 },
-          { name = "buffer", keyword_length = 3 },
+          { name = "luasnip",  keyword_length = 2 },
+          { name = "buffer",   keyword_length = 3 },
         },
         mapping = cmp.mapping.preset.insert {
           ["<c-j>"] = cmp.mapping(function()
