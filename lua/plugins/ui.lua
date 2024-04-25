@@ -193,4 +193,22 @@ return {
       vim.opt.showtabline = 1
     end,
   },
+  {
+    "beauwilliams/focus.nvim",
+    config = function()
+      require("focus").setup {
+        autoresize = {
+          width = 999,
+          height = 999,
+          minwidth = 50,
+          minheight = 5,
+        },
+        ui = {
+          cursorline = false,
+          signcolumn = false,
+          winhighlight = false,
+        },
+      }
+    end
+  },
 }
