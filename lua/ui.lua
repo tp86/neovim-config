@@ -13,6 +13,7 @@ register_autocmds_group("GuiConfig", {
         execute_if_command_exists("GuiFont! " .. vim.g.guifont)
         vim.opt.guicursor = [[n-v-c-sm:block-Cursor,i-ci-ve:ver25-blinkwait200-blinkon500-blinkoff500,r-cr-o:hor20]]
         vim.opt.mouse = "a"
+        vim.opt.background = "light"
       end
     end,
   },
