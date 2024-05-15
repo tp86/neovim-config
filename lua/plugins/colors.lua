@@ -24,6 +24,9 @@ return {
     end,
   },
   {
+    "Tsuzat/NeoSolarized.nvim",
+  },
+  {
     "HiPhish/rainbow-delimiters.nvim",
     config = function()
       require("rainbow-delimiters.setup").setup {
@@ -40,6 +43,6 @@ return {
     end,
   },
   function()
-    vim.cmd.colorscheme("duskfox")
+    vim.cmd.colorscheme("NeoSolarized")
   end,
 }
