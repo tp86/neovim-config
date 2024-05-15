@@ -43,6 +43,7 @@ return {
     end,
   },
   function()
+    vim.opt.background = "light"
     vim.cmd.colorscheme("NeoSolarized")
   end,
 }

@@ -1,10 +1,11 @@
-vim.g.loaded_netrw = 1
-vim.g.loaded_netrwPlugin = 1
-
 return {
   require("plugins.common")["web-devicons"],
   {
     "nvim-tree/nvim-tree.lua",
+    config_before = function()
+      vim.g.loaded_netrw = 1
+      vim.g.loaded_netrwPlugin = 1
+    end,
     config = function()
       require("nvim-tree").setup {
         actions = {
