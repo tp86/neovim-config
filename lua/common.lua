@@ -66,15 +66,14 @@ if ok then
   capabilities = cmp_nvim_lsp.default_capabilities(vim.lsp.protocol.make_client_capabilities())
 end
 
-local function setup_lsp(config_name, server_name, settings)
+local function setup_lsp(config_name, server_name, options)
   server_name = server_name or config_name
   with_dependencies({ server_name }, function()
     local lspconfig = require("lspconfig")
-    lspconfig[config_name].setup {
-      on_attach = on_attach,
-      capabilities = capabilities,
-      settings = settings,
-    }
+    options = options or {}
+    options.capabilities = capabilities
+    options.on_attach = on_attach
+    lspconfig[config_name].setup(options)
   end, warn(("%s not available"):format(server_name)))
 end
 
