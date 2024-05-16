@@ -15,6 +15,13 @@ return {
   {
     "MeanderingProgrammer/markdown.nvim",
     config = function()
+      local ok, ts = pcall(require, "nvim-treesitter.install")
+      if ok then
+        ts.ensure_installed {
+          "markdown",
+          "markdown_inline",
+        }
+      end
       require("render-markdown").setup()
     end,
   },

@@ -16,6 +16,7 @@ register_autocmds_group("GuiConfig", {
         vim.opt.background = "light"
       end
     end,
+    nested = true,
   },
   {
     "DirChanged",
