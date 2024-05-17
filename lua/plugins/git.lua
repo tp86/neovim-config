@@ -62,6 +62,7 @@ return {
   },
   {
     "NeogitOrg/neogit",
+    tag = vim.fn.has("nvim-0.10") == 0 and 'v0.0.1' or nil,
     config = function()
       local opts = {
         disable_commit_confirmation = true,

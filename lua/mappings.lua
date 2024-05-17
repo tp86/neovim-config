@@ -105,7 +105,7 @@ map.i("<a-d>", "<c-o>D", "Delete until end of line in insert mode")
 
 map.n("<backspace>", "<c-6>", "Edit the alternate file")
 
-if not vim.fn.has("nvim-0.10") then
+if vim.fn.has("nvim-0.10") == 0 then
   map.n("]d", vim.diagnostic.goto_next, "Go to next diagnostic")
   map.n("[d", vim.diagnostic.goto_prev, "Go to previous diagnostic")
 end

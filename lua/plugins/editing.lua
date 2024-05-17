@@ -20,7 +20,7 @@ local plugins = {
   },
   { "gpanders/nvim-parinfer" },
 }
-if not vim.fn.has("nvim-0.10") then
+if vim.fn.has("nvim-0.10") == 0 then
   table.insert(plugins,
     {
       "terrortylor/nvim-comment",

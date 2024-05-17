@@ -173,17 +173,19 @@ register_autocmds_group("ShowDiagnostics", {
   },
 })
 
-register_autocmds_group("ForceInlayHintsRefresh", {
-  {
-    "BufEnter",
-    callback = function(ctx)
-      local filter = {
-        bufnr = ctx.buf,
-      }
-      vim.lsp.inlay_hint.enable(
-        vim.lsp.inlay_hint.is_enabled(filter),
-        filter
-      )
-    end,
-  }
-})
+if vim.fn.has("nvim-0.10") ~= 0 then
+  register_autocmds_group("ForceInlayHintsRefresh", {
+    {
+      "BufEnter",
+      callback = function(ctx)
+        local filter = {
+          bufnr = ctx.buf,
+        }
+        vim.lsp.inlay_hint.enable(
+          vim.lsp.inlay_hint.is_enabled(filter),
+          filter
+        )
+      end,
+    }
+  })
+end
