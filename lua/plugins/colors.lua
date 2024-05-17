@@ -25,6 +25,15 @@ return {
   },
   {
     "Tsuzat/NeoSolarized.nvim",
+    config = function()
+      require("NeoSolarized").setup {
+        transparent = false,
+        terminal_colors = false,
+        on_highlights = function(highlights, colors)
+          highlights.LineNr.bg = highlights.Normal.bg
+        end
+      }
+    end,
   },
   {
     "HiPhish/rainbow-delimiters.nvim",
@@ -43,6 +52,7 @@ return {
     end,
   },
   function()
+    vim.opt.background = "light"
     vim.cmd.colorscheme("NeoSolarized")
   end,
 }

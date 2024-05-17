@@ -32,7 +32,7 @@ return {
         local current_line_blame_hl_name = "GitSignsCurrentLineBlame"
         local opts = {
           italic = true,
-          fg = inttocolorstring(vim.api.nvim_get_hl(0, {name="NonText"}).fg)
+          fg = inttocolorstring(vim.api.nvim_get_hl(0, { name = "NonText" }).fg)
         }
         vim.api.nvim_set_hl(0, current_line_blame_hl_name, opts)
       end
@@ -72,6 +72,7 @@ return {
         },
         commit_editor = {
           kind = "split",
+          show_staged_diff = false,
         },
       }
       local ok = pcall(require, "diffview")
@@ -82,6 +83,18 @@ return {
       neogit.setup(opts)
       local common = require("common")
       common.map.n("<localleader>gg", neogit.open, "Open Neogit window")
+      -- make highlighting more consistent
+      vim.api.nvim_set_hl(0, "NeogitHunkHeader", { link = "NeogitHunkHeaderHighlight" })
+      vim.api.nvim_set_hl(0, "NeogitHunkHeaderCursor", { link = "NeogitHunkHeaderHighlight" })
+      vim.api.nvim_set_hl(0, "NeogitDiffContext", { link = "NeogitDiffContextHighlight" })
+      vim.api.nvim_set_hl(0, "NeogitDiffContextCursor", { link = "NeogitDiffContextHighlight" })
+      vim.api.nvim_set_hl(0, "NeogitDiffAdd", { link = "DiffAdd" })
+      vim.api.nvim_set_hl(0, "NeogitDiffAddHighlight", { link = "NeogitDiffAdd" })
+      vim.api.nvim_set_hl(0, "NeogitDiffAddCursor", { link = "NeogitDiffAdd" })
+      vim.api.nvim_set_hl(0, "NeogitDiffDelete", { link = "DiffDelete" })
+      vim.api.nvim_set_hl(0, "NeogitDiffDeleteHighlight", { link = "NeogitDiffDelete" })
+      vim.api.nvim_set_hl(0, "NeogitDiffDeleteCursor", { link = "NeogitDiffDelete" })
+      vim.api.nvim_set_hl(0, "NeogitDiffHeaderCursor", { link = "NeogitDiffHeader" })
     end,
   },
   {

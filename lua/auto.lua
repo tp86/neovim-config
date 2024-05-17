@@ -15,6 +15,8 @@ local function sync_dynamic_option(opt_name, is_bool)
       dynamic_options[opt_name] = false
     elseif new_value == "1" then
       dynamic_options[opt_name] = true
+    elseif type(new_value) == "boolean" then
+      dynamic_options[opt_name] = new_value
     else
       local msg = ('"Value for boolean option %s expected to be 0 or 1, got %s"')
           :format(opt_name, new_value)
@@ -161,10 +163,27 @@ register_autocmds_group("QuickfixOpenAfterGrep", {
 vim.diagnostic.config {
   virtual_text = false,
 }
-o.updatetime = 2000
+o.updatetime = 1000
 register_autocmds_group("ShowDiagnostics", {
   {
     "CursorHold",
-    callback = vim.diagnostic.open_float,
+    callback = function()
+      vim.diagnostic.open_float()
+    end,
   },
+})
+
+register_autocmds_group("ForceInlayHintsRefresh", {
+  {
+    "BufEnter",
+    callback = function(ctx)
+      local filter = {
+        bufnr = ctx.buf,
+      }
+      vim.lsp.inlay_hint.enable(
+        vim.lsp.inlay_hint.is_enabled(filter),
+        filter
+      )
+    end,
+  }
 })

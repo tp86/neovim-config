@@ -36,9 +36,9 @@ local imap = make_map("i")
 local vmap = make_map("x")
 local tmap = make_map("t")
 local cmap = make_map("c")
-local map = make_map({"n", "x", "o"})
+local map = make_map({ "n", "x", "o" })
 
-local function on_attach(_, bufnr)
+local function on_attach(client, bufnr)
   ---@diagnostic disable-next-line:redefined-local
   local map_opts = {
     noremap = true,
@@ -58,6 +58,10 @@ local function on_attach(_, bufnr)
   map("<localleader>r", vim.lsp.buf.rename, "Rename symbol")
   map("<localleader>=", function() vim.lsp.buf.format { async = true } end, "Format document")
   map("<localleader>a", vim.lsp.buf.code_action, "Code action")
+
+  if client.server_capabilities.inlayHintProvider then
+    vim.lsp.inlay_hint.enable(true, {bufnr=bufnr})
+  end
 end
 
 local capabilities
@@ -86,7 +90,7 @@ local function register_autocmds_group(group_name, cmds)
     for key, value in pairs(cmd) do
       if type(key) == "number" then -- event name
         table.insert(events, value)
-      else -- autocmd option
+      else                          -- autocmd option
         opts[key] = value
       end
     end
