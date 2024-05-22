@@ -195,16 +195,23 @@ register_autocmds_group("FiletypeSpecific", {
     "BufWinEnter",
     pattern = "*.go",
     callback = function()
-      local chars = vim.opt_local.listchars:get()
+      local chars = ol.listchars:get()
       chars.tab = "  "
-      vim.opt_local.listchars = chars
+      ol.listchars = chars
     end,
   },
   {
     "BufWinLeave",
     pattern = "*.go",
     callback = function()
-      vim.opt_local.listchars = vim.opt_global.listchars:get()
+      ol.listchars = vim.opt_global.listchars:get()
+    end,
+  },
+  {
+    "WinEnter",
+    pattern = "*.go",
+    callback = function()
+      ol.colorcolumn = {}
     end,
   },
 })
