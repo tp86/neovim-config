@@ -109,3 +109,5 @@ if vim.fn.has("nvim-0.10") == 0 then
   map.n("]d", vim.diagnostic.goto_next, "Go to next diagnostic")
   map.n("[d", vim.diagnostic.goto_prev, "Go to previous diagnostic")
 end
+
+map.n("<leader>d", vim.diagnostic.setqflist, "List diagnostic in QuickFix window")

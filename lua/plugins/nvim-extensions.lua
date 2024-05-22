@@ -151,7 +151,7 @@ local plugins = {
         },
       }
       local common = require("common")
-      common.map.n("<leader>j", flash.jump, "Flash jump")
+      common.map.n("sj", flash.jump, "Flash jump")
     end,
   },
   {
