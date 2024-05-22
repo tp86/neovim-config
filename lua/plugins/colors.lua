@@ -31,6 +31,10 @@ return {
         terminal_colors = false,
         on_highlights = function(highlights, colors)
           highlights.LineNr.bg = highlights.Normal.bg
+          highlights.LspInlayHint = {
+            fg = colors.fg2,
+            bg = colors.bg1,
+          }
         end
       }
     end,
