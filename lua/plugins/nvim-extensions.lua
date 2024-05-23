@@ -21,6 +21,20 @@ local plugins = {
         config.capabilities = common.lsp.capabilities
         lspconfig[server].setup(config)
       end
+      local gopls_default_config = require("lspconfig.server_configurations.gopls")
+      gopls_default_config.default_config.settings = {
+        gopls = {
+          hints = {
+            assignVariableTypes = true,
+            compositeLiteralFields = true,
+            compositeLiteralTypes = false,
+            constantValues = false,
+            functionTypeParameters = false,
+            parameterNames = true,
+            rangeVariableTypes = false,
+          },
+        },
+      }
     end,
   },
   { "hrsh7th/cmp-buffer" },
