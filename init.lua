@@ -1,3 +1,4 @@
+vim.loader.enable()
 require("require-reload")
 require("basic", true)
 require("options", true)
