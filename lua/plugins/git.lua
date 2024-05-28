@@ -84,18 +84,27 @@ return {
       neogit.setup(opts)
       local common = require("common")
       common.map.n("<localleader>gg", neogit.open, "Open Neogit window")
-      -- make highlighting more consistent
-      vim.api.nvim_set_hl(0, "NeogitHunkHeader", { link = "NeogitHunkHeaderHighlight" })
-      vim.api.nvim_set_hl(0, "NeogitHunkHeaderCursor", { link = "NeogitHunkHeaderHighlight" })
-      vim.api.nvim_set_hl(0, "NeogitDiffContext", { link = "NeogitDiffContextHighlight" })
-      vim.api.nvim_set_hl(0, "NeogitDiffContextCursor", { link = "NeogitDiffContextHighlight" })
-      vim.api.nvim_set_hl(0, "NeogitDiffAdd", { link = "DiffAdd" })
-      vim.api.nvim_set_hl(0, "NeogitDiffAddHighlight", { link = "NeogitDiffAdd" })
-      vim.api.nvim_set_hl(0, "NeogitDiffAddCursor", { link = "NeogitDiffAdd" })
-      vim.api.nvim_set_hl(0, "NeogitDiffDelete", { link = "DiffDelete" })
-      vim.api.nvim_set_hl(0, "NeogitDiffDeleteHighlight", { link = "NeogitDiffDelete" })
-      vim.api.nvim_set_hl(0, "NeogitDiffDeleteCursor", { link = "NeogitDiffDelete" })
-      vim.api.nvim_set_hl(0, "NeogitDiffHeaderCursor", { link = "NeogitDiffHeader" })
+      local function on_highlight()
+        -- make highlighting more consistent
+        vim.api.nvim_set_hl(0, "NeogitHunkHeader", { link = "NeogitHunkHeaderHighlight" })
+        vim.api.nvim_set_hl(0, "NeogitHunkHeaderCursor", { link = "NeogitHunkHeaderHighlight" })
+        vim.api.nvim_set_hl(0, "NeogitDiffContext", { link = "NeogitDiffContextHighlight" })
+        vim.api.nvim_set_hl(0, "NeogitDiffContextCursor", { link = "NeogitDiffContextHighlight" })
+        vim.api.nvim_set_hl(0, "NeogitDiffAdd", { link = "DiffAdd" })
+        vim.api.nvim_set_hl(0, "NeogitDiffAddHighlight", { link = "NeogitDiffAdd" })
+        vim.api.nvim_set_hl(0, "NeogitDiffAddCursor", { link = "NeogitDiffAdd" })
+        vim.api.nvim_set_hl(0, "NeogitDiffDelete", { link = "DiffDelete" })
+        vim.api.nvim_set_hl(0, "NeogitDiffDeleteHighlight", { link = "NeogitDiffDelete" })
+        vim.api.nvim_set_hl(0, "NeogitDiffDeleteCursor", { link = "NeogitDiffDelete" })
+        vim.api.nvim_set_hl(0, "NeogitDiffHeaderCursor", { link = "NeogitDiffHeader" })
+      end
+      on_highlight()
+      common.register_autocmds_group("NeogitColorscheme", {
+        {
+          "ColorScheme",
+          callback = on_highlight,
+        },
+      })
     end,
   },
   {
