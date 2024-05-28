@@ -111,3 +111,6 @@ if vim.fn.has("nvim-0.10") == 0 then
 end
 
 map.n("<leader>d", vim.diagnostic.setqflist, "List diagnostic in QuickFix window")
+
+map.n("[c", ":cprevious<cr>", "Go to previous quickfix")
+map.n("]c", ":cnext<cr>", "Go to next quickfix")
