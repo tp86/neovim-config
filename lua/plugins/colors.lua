@@ -28,7 +28,7 @@ return {
     config = function()
       require("NeoSolarized").setup {
         transparent = false,
-        terminal_colors = false,
+        terminal_colors = true,
         on_highlights = function(highlights, colors)
           highlights.LineNr.bg = highlights.Normal.bg
           highlights.LspInlayHint = {
