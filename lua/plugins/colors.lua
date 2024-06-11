@@ -29,6 +29,12 @@ return {
       require("NeoSolarized").setup {
         transparent = false,
         terminal_colors = true,
+        enable_italics = false,
+        styles = {
+          comments = { italic = false },
+          keywords = { italic = false },
+          string = { italic = false },
+        },
         on_highlights = function(highlights, colors)
           highlights.LineNr.bg = highlights.Normal.bg
           highlights.LspInlayHint = {
