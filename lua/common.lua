@@ -58,6 +58,7 @@ local function on_attach(client, bufnr)
   map("<localleader>r", vim.lsp.buf.rename, "Rename symbol")
   map("<localleader>=", function() vim.lsp.buf.format { async = true } end, "Format document")
   map("<localleader>a", vim.lsp.buf.code_action, "Code action")
+  map("<c-k>", vim.lsp.buf.signature_help, "Toggle signature help")
 
   if client.server_capabilities.inlayHintProvider then
     vim.lsp.inlay_hint.enable(true, {bufnr=bufnr})
