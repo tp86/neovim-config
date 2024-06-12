@@ -38,6 +38,24 @@ local tmap = make_map("t")
 local cmap = make_map("c")
 local map = make_map({ "n", "x", "o" })
 
+local augroup_opts = { clear = true }
+-- register autocmds in augroup
+local function register_autocmds_group(group_name, cmds)
+  local group = vim.api.nvim_create_augroup(group_name, augroup_opts)
+  for _, cmd in ipairs(cmds) do
+    local events, opts = {}, {}
+    for key, value in pairs(cmd) do
+      if type(key) == "number" then -- event name
+        table.insert(events, value)
+      else                          -- autocmd option
+        opts[key] = value
+      end
+    end
+    opts = vim.tbl_extend("keep", { group = group }, opts)
+    vim.api.nvim_create_autocmd(events, opts)
+  end
+end
+
 local function on_attach(client, bufnr)
   ---@diagnostic disable-next-line:redefined-local
   local map_opts = {
@@ -58,10 +76,35 @@ local function on_attach(client, bufnr)
   map("<localleader>r", vim.lsp.buf.rename, "Rename symbol")
   map("<localleader>=", function() vim.lsp.buf.format { async = true } end, "Format document")
   map("<localleader>a", vim.lsp.buf.code_action, "Code action")
+  -- inspired by: https://neovim.discourse.group/t/show-signature-help-on-insert-mode/2007/5
+  local function handler(original_handler)
+    local win_opened = false
+    return function(...)
+      if win_opened then return end
+      local buf, win = original_handler(...)
+      win_opened = true
+      vim.api.nvim_create_autocmd({ "WinClosed" }, {
+        pattern = tostring(win),
+        callback = function()
+          win_opened = false
+        end,
+      })
+    end
+  end
+  vim.lsp.handlers['textDocument/signatureHelp'] = vim.lsp.with(
+    handler(vim.lsp.handlers.signature_help),
+    { focus = false, }
+  )
   map("<c-k>", vim.lsp.buf.signature_help, "Toggle signature help")
+  register_autocmds_group("LspSignature", {
+    {
+      "CursorHoldI",
+      callback = vim.lsp.buf.signature_help,
+    }
+  })
 
   if client.server_capabilities.inlayHintProvider then
-    vim.lsp.inlay_hint.enable(true, {bufnr=bufnr})
+    vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
   end
 end
 
@@ -82,46 +125,6 @@ local function setup_lsp(config_name, server_name, options)
   end, warn(("%s not available"):format(server_name)))
 end
 
-local augroup_opts = { clear = true }
--- register autocmds in augroup
-local function register_autocmds_group(group_name, cmds)
-  local group = vim.api.nvim_create_augroup(group_name, augroup_opts)
-  for _, cmd in ipairs(cmds) do
-    local events, opts = {}, {}
-    for key, value in pairs(cmd) do
-      if type(key) == "number" then -- event name
-        table.insert(events, value)
-      else                          -- autocmd option
-        opts[key] = value
-      end
-    end
-    opts = vim.tbl_extend("keep", { group = group }, opts)
-    vim.api.nvim_create_autocmd(events, opts)
-  end
-end
-
-local function config_local_colorscheme(colorscheme_name)
-  local config_local_filename = require("config-local").lookup()
-  if vim.g.config_local_loaded ~= config_local_filename then
-    vim.g.colors_name_previous = vim.g.colors_name
-  end
-  vim.g.config_local_loaded = config_local_filename
-  vim.cmd.colorscheme(colorscheme_name)
-  register_autocmds_group("ConfigLocalLeaveDir", {
-    {
-      "DirChangedPre",
-      pattern = "global",
-      callback = function(event)
-        if vim.fn.isdirectory(vim.fn.expand(event.file)) ~= 0 then
-          vim.cmd.colorscheme(vim.g.colors_name_previous)
-          vim.api.nvim_del_augroup_by_name("ConfigLocalLeaveDir")
-        end
-      end,
-      nested = true,
-    }
-  })
-end
-
 return {
   with_dependencies = with_dependencies,
   warn = warn,
@@ -138,5 +141,4 @@ return {
     setup = setup_lsp,
   },
   register_autocmds_group = register_autocmds_group,
-  config_local_colorscheme = config_local_colorscheme,
 }
