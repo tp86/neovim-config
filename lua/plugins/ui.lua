@@ -193,4 +193,20 @@ return {
       vim.opt.showtabline = 1
     end,
   },
+  {
+    "nvim-focus/focus.nvim",
+    config = function()
+      require("focus").setup {
+        commands = false,
+        autoresize = {
+          minheight = 3,
+          minwidth = 20,
+        },
+        ui = {
+          cursorline = false,
+          signcolumn = false,
+        }
+      }
+    end,
+  },
 }
