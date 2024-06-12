@@ -114,3 +114,6 @@ map.n("<leader>d", vim.diagnostic.setqflist, "List diagnostic in QuickFix window
 
 map.n("[c", ":cprevious<cr>", "Go to previous quickfix")
 map.n("]c", ":cnext<cr>", "Go to next quickfix")
+
+map.v("J", ":move '>+1<cr>gv=gv", "Move selected lines down")
+map.v("K", ":move '<-2<cr>gv=gv", "Move selected lines up")
