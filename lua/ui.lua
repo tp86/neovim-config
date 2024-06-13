@@ -29,3 +29,15 @@ register_autocmds_group("GuiConfig", {
 vim.g.guifont = "Hack:h14"
 vim.opt.title = true
 vim.opt.titlestring = vim.fn.pathshorten(vim.fn.getenv("PWD"))
+
+-- set background automatically
+local function set_background()
+  local hour = os.date("*t").hour
+  local background = "light"
+  if hour < 7 or hour > 19 then
+    background = "dark"
+  end
+  vim.opt.background = background
+end
+vim.fn.timer_start(1000 * 30, set_background, { ["repeat"] = -1 })
+set_background()
