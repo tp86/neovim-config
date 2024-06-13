@@ -204,7 +204,36 @@ local plugins = {
     -- config = function()
     --   require("dap-go").setup {}
     -- end,
-  }
+  },
+  {
+    "MarcWeber/vim-addon-qf-layout",
+    config_before = function()
+      local function shorten()
+        local list = vim.fn.copy(vim.fn["vim_addon_qf_layout#GetList"]())
+        local max_filename_len, max_loc_len = 0, 0
+        local function loc(l, c)
+          return ("%d:%d"):format(l, c)
+        end
+        for _, l in ipairs(list) do
+          l.filename = vim.fn.pathshorten(vim.fn.bufname(l.bufnr))
+          max_filename_len = math.max(max_filename_len, #l.filename)
+          max_loc_len = math.max(max_loc_len, #loc(l.lnum, l.col))
+        end
+        max_filename_len = math.min(max_filename_len, 60)
+        local formatted = {}
+        for _, l in ipairs(list) do
+          table.insert(formatted, ("%-"..max_filename_len.."s|%"..max_loc_len.."s| %s"):format(l.filename, loc(l.lnum, l.col), l.text))
+        end
+        vim.fn.append(0, formatted)
+      end
+      vim.g.vim_addon_qf_layout = {
+        quickfix_formatters = {
+          shorten,
+          -- vim.fn["vim_addon_qf_layout#FormatterNoFilename"],
+        }
+      }
+    end,
+  },
 }
 
 common.with_dependencies({ "gcc" }, function()

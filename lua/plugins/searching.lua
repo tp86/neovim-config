@@ -17,6 +17,7 @@ common.with_dependencies({ "make", "gcc" }, function()
         defaults = {
           file_ignore_patterns = { ".git/" },
           layout_strategy = "vertical",
+          path_display = { "shorten" },
         },
       }
 
