@@ -207,6 +207,16 @@ return {
           signcolumn = false,
         }
       }
+      local common = require("common")
+      local ignoredfiletypes = { "NvimTree" }
+      common.register_autocmds_group("FocusDisable", {
+        {
+          "FileType",
+          callback = function()
+            vim.b.focus_disable = vim.tbl_contains(ignoredfiletypes, vim.bo.filetype)
+          end,
+        }
+      })
     end,
   },
 }
