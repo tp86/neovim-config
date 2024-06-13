@@ -56,6 +56,29 @@ local function register_autocmds_group(group_name, cmds)
   end
 end
 
+-- inspired by: https://neovim.discourse.group/t/show-signature-help-on-insert-mode/2007/5
+local function handler(original_handler)
+  local win_opened = false
+  return function(...)
+    if win_opened then return end
+    local buf, win = original_handler(...)
+    if win then
+      win_opened = true
+      vim.api.nvim_create_autocmd({ "WinClosed" }, {
+        pattern = tostring(win),
+        callback = function()
+          win_opened = false
+        end,
+      })
+    end
+    return buf, win
+  end
+end
+vim.lsp.handlers['textDocument/signatureHelp'] = vim.lsp.with(
+  handler(vim.lsp.handlers.signature_help),
+  { focus = false, }
+)
+
 local function on_attach(client, bufnr)
   ---@diagnostic disable-next-line:redefined-local
   local map_opts = {
@@ -76,29 +99,11 @@ local function on_attach(client, bufnr)
   map("<localleader>r", vim.lsp.buf.rename, "Rename symbol")
   map("<localleader>=", function() vim.lsp.buf.format { async = true } end, "Format document")
   map("<localleader>a", vim.lsp.buf.code_action, "Code action")
-  -- inspired by: https://neovim.discourse.group/t/show-signature-help-on-insert-mode/2007/5
-  local function handler(original_handler)
-    local win_opened = false
-    return function(...)
-      if win_opened then return end
-      local buf, win = original_handler(...)
-      win_opened = true
-      vim.api.nvim_create_autocmd({ "WinClosed" }, {
-        pattern = tostring(win),
-        callback = function()
-          win_opened = false
-        end,
-      })
-    end
-  end
-  vim.lsp.handlers['textDocument/signatureHelp'] = vim.lsp.with(
-    handler(vim.lsp.handlers.signature_help),
-    { focus = false, }
-  )
   map("<c-k>", vim.lsp.buf.signature_help, "Toggle signature help")
   register_autocmds_group("LspSignature", {
     {
       "CursorHoldI",
+      buffer = bufnr,
       callback = vim.lsp.buf.signature_help,
     }
   })
