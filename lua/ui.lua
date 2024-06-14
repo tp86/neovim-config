@@ -34,10 +34,12 @@ vim.opt.titlestring = vim.fn.pathshorten(vim.fn.getenv("PWD"))
 local function set_background()
   local hour = os.date("*t").hour
   local background = "light"
-  if hour < 7 or hour > 19 then
+  if hour < 8 or hour >= 19 then
     background = "dark"
   end
-  vim.opt.background = background
+  if vim.opt.background:get() ~= background then
+    vim.opt.background = background
+  end
 end
 vim.fn.timer_start(1000 * 30, set_background, { ["repeat"] = -1 })
 set_background()
