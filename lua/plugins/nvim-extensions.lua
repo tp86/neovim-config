@@ -1,4 +1,6 @@
-local common = require("common")
+local with_dependencies = require("utils.deps").with_dependencies
+local log = require("utils.log")
+local map = require("mappings").map
 
 local plugins = {
   {
@@ -10,17 +12,6 @@ local plugins = {
   {
     "neovim/nvim-lspconfig",
     config = function()
-      local enabled_servers = {}
-      common.with_dependencies({ "lua-language-server" }, function()
-        enabled_servers.lua_ls = { settings = {} }
-      end, common.warn("lua-language-server not available"))
-
-      local lspconfig = require("lspconfig")
-      for server, config in pairs(enabled_servers) do
-        config.on_attach = common.lsp.on_attach
-        config.capabilities = common.lsp.capabilities
-        lspconfig[server].setup(config)
-      end
       local gopls_default_config = require("lspconfig.server_configurations.gopls")
       gopls_default_config.default_config.settings = {
         gopls = {
@@ -45,7 +36,7 @@ local plugins = {
     config = function()
       require("luasnip").cleanup()
       require("luasnip.loaders.from_snipmate").lazy_load()
-      common.map.i("<esc>", function()
+      map.i("<esc>", function()
         require("luasnip").unlink_current()
         -- TODO try to refer to existing key
         vim.cmd.stopinsert()
@@ -88,7 +79,6 @@ local plugins = {
               buffer = "[buf]",
               nvim_lsp = "[LSP]",
               luasnip = "[snip]",
-
             },
           },
         },
@@ -146,34 +136,21 @@ local plugins = {
     end,
   },
   {
-    "folke/flash.nvim",
-    config = function()
-      local flash = require("flash")
-      flash.setup {
-        highlight = {
-          backdrop = false,
-        },
-        modes = {
-          char = {
-            highlight = {
-              backdrop = false
-            }
-          },
-          search = {
-            enabled = false,
-          },
-        },
-      }
-      local common = require("common")
-      common.map.n("sj", flash.jump, "Flash jump")
-    end,
-  },
-  {
     "mfussenegger/nvim-dap",
     config = function()
-      vim.fn.sign_define("DapBreakpoint", { text = '●', texthl = 'Error', linehl = '', numhl = '' })
-      vim.fn.sign_define("DapStopped", { text = '▶', texthl = '', linehl = '', numhl = '' })
-      local nmap = require("common").map.n
+      vim.fn.sign_define("DapBreakpoint", {
+        text = '●',
+        texthl = 'Error',
+        linehl = '',
+        numhl = '',
+      })
+      vim.fn.sign_define("DapStopped", {
+        text = '▶',
+        texthl = '',
+        linehl = '',
+        numhl = '',
+      })
+      local nmap = require("mappings").map.n
       local dap = require("dap")
       nmap("<a-7>", dap.continue, "Debug: continue")
       nmap("<a-8>", dap.step_over, "Debug: step over")
@@ -184,9 +161,7 @@ local plugins = {
       nmap("<localleader><a-->", dap.terminate, "Debug: terminate")
     end,
   },
-  {
-    "nvim-neotest/nvim-nio",
-  },
+  { "nvim-neotest/nvim-nio" },
   {
     "rcarriga/nvim-dap-ui",
     config = function()
@@ -199,12 +174,7 @@ local plugins = {
       dap.listeners.before.event_exited.dapui_config = dapui.close
     end,
   },
-  {
-    "leoluz/nvim-dap-go",
-    -- config = function()
-    --   require("dap-go").setup {}
-    -- end,
-  },
+  { "leoluz/nvim-dap-go", }, -- install plugin, but do not activate, activation in specific projects
   {
     "MarcWeber/vim-addon-qf-layout",
     config_before = function()
@@ -236,7 +206,7 @@ local plugins = {
   },
 }
 
-common.with_dependencies({ "gcc" }, function()
+with_dependencies({ "gcc" }, function()
   -- additional extensions for nvim-treesitter
   --table.insert(plugins, { "p00f/nvim-ts-rainbow" })
   table.insert(plugins, { "nvim-treesitter/nvim-treesitter-textobjects" })
@@ -304,10 +274,9 @@ common.with_dependencies({ "gcc" }, function()
     config = function()
       require("nvim-dap-virtual-text").setup {
         enabled_commands = false,
-
       }
     end,
   })
-end, common.warn("nvim-treesitter is not installed due to: gcc not available"))
+end, log.warn("nvim-treesitter is not installed due to: gcc not available"))
 
 return plugins

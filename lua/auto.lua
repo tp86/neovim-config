@@ -1,55 +1,57 @@
-local highlight_excluded_filetypes = { "help", "NvimTree", "dap-repl" }
-local function exclude_highlighting(filetype)
-  return vim.tbl_contains(highlight_excluded_filetypes, filetype)
-      or filetype:match("^dapui_")
-end
-local colorcolumn_inactive = {}
-for i = 1, 999 do colorcolumn_inactive[i] = i end
-
-local dynamic_options = require("dynamic_options")
--- helper for synchronizing dynamic option changes
-local function sync_dynamic_option(opt_name, is_bool)
-  local function bool_option_callback()
-    local new_value = vim.v.option_new
-    if new_value == "0" then
-      dynamic_options[opt_name] = false
-    elseif new_value == "1" then
-      dynamic_options[opt_name] = true
-    elseif type(new_value) == "boolean" then
-      dynamic_options[opt_name] = new_value
-    else
-      local msg = ('"Value for boolean option %s expected to be 0 or 1, got %s"')
-          :format(opt_name, new_value)
-      vim.cmd('echoerr ' .. msg)
+local augroup_opts = { clear = true }
+-- register autocmds in augroup
+local function augroup(group_name, cmds)
+  local group = vim.api.nvim_create_augroup(group_name, augroup_opts)
+  for _, cmd in ipairs(cmds) do
+    local events, opts = {}, {}
+    for key, value in pairs(cmd) do
+      if type(key) == "number" then -- event name
+        table.insert(events, value)
+      else                          -- autocmd option
+        opts[key] = value
+      end
     end
+    opts = vim.tbl_extend("keep", { group = group }, opts)
+    vim.api.nvim_create_autocmd(events, opts)
   end
-  local function option_callback()
-    dynamic_options[opt_name] = vim.v.option_new
-  end
-  -- return autocmd definition in format expected by register_autocmds_group
+end
+
+local dynamic_options = require("options").dynamic
+-- helper for synchronizing dynamic option changes
+local function sync_dynamic_option(opt_name)
+  -- return autocmd definition in format expected by `augroup`
   return {
     "OptionSet",
     pattern = opt_name,
-    callback = is_bool and bool_option_callback or option_callback,
+    callback = function()
+      dynamic_options[opt_name] = vim.v.option_new
+    end,
   }
 end
 
 local o = vim.opt
 local ol = vim.opt_local
 
-local register_autocmds_group = require("common").register_autocmds_group
 -- colorcolumn in active window, colorize all columns in inactive window
-register_autocmds_group("ColorColumn", {
+local colorcolumn_inactive = {}
+for i = 1, 999 do colorcolumn_inactive[i] = i end
+-- TODO extend in plugins
+local highlight_excluded_filetypes = { "help", "NvimTree", "dap-repl" }
+local function exclude_highlighting(filetype)
+  return vim.tbl_contains(highlight_excluded_filetypes, filetype)
+      or filetype:match("^dapui_")
+end
+augroup("ColorColumn", {
   {
     "BufNewFile",
     "BufRead",
     "BufWinEnter",
     "WinEnter",
     callback = function()
-      if not exclude_highlighting(vim.o.filetype) then
-        ol.colorcolumn = dynamic_options.colorcolumn
-      else
+      if exclude_highlighting(vim.o.filetype) then
         ol.colorcolumn = {}
+      else
+        ol.colorcolumn = dynamic_options.colorcolumn
       end
     end,
   },
@@ -64,7 +66,7 @@ register_autocmds_group("ColorColumn", {
   sync_dynamic_option("colorcolumn"),
 })
 
-register_autocmds_group("SearchHl", {
+augroup("SearchHl", {
   {
     "CmdlineEnter",
     pattern = { "/", "?" },
@@ -79,11 +81,11 @@ register_autocmds_group("SearchHl", {
       o.hlsearch = dynamic_options.hlsearch
     end,
   },
-  sync_dynamic_option("hlsearch", true),
+  sync_dynamic_option("hlsearch"),
 })
 
 -- automating terminal settings
-register_autocmds_group("TerminalSettings", {
+augroup("TerminalSettings", {
   {
     "TermOpen",
     callback = function()
@@ -112,7 +114,7 @@ register_autocmds_group("TerminalSettings", {
 })
 
 vim.g.autoretab = true
-register_autocmds_group("AutoRetab", {
+augroup("AutoRetab", {
   {
     "BufWrite",
     callback = function()
@@ -134,7 +136,7 @@ local cmds = {
   -- if line contains only whitespace characters, leave it as is
   [[s/\v\S\zs\s+$]],
 }
-register_autocmds_group("AutoRemoveTrailingSpaces", {
+augroup("AutoRemoveTrailingSpaces", {
   {
     "BufWrite",
     callback = function()
@@ -152,7 +154,7 @@ register_autocmds_group("AutoRemoveTrailingSpaces", {
   },
 })
 
-register_autocmds_group("QuickfixOpenAfterGrep", {
+augroup("QuickfixOpenAfterGrep", {
   {
     "QuickfixCmdPost",
     pattern = "grep",
@@ -160,11 +162,7 @@ register_autocmds_group("QuickfixOpenAfterGrep", {
   },
 })
 
-vim.diagnostic.config {
-  virtual_text = false,
-}
-o.updatetime = 1000
-register_autocmds_group("ShowDiagnostics", {
+augroup("ShowDiagnostics", {
   {
     "CursorHold",
     callback = function()
@@ -173,45 +171,21 @@ register_autocmds_group("ShowDiagnostics", {
   },
 })
 
-if vim.fn.has("nvim-0.10") ~= 0 then
-  register_autocmds_group("ForceInlayHintsRefresh", {
-    {
-      "BufEnter",
-      callback = function(ctx)
-        local filter = {
-          bufnr = ctx.buf,
-        }
-        vim.lsp.inlay_hint.enable(
-          vim.lsp.inlay_hint.is_enabled(filter),
-          filter
-        )
-      end,
-    }
-  })
-end
-
-register_autocmds_group("FiletypeSpecific", {
+augroup("ForceInlayHintsRefresh", {
   {
-    "BufWinEnter",
-    pattern = "*.go",
-    callback = function()
-      local chars = ol.listchars:get()
-      chars.tab = "  "
-      ol.listchars = chars
+    "BufEnter",
+    callback = function(ctx)
+      local filter = {
+        bufnr = ctx.buf,
+      }
+      vim.lsp.inlay_hint.enable(
+        vim.lsp.inlay_hint.is_enabled(filter),
+        filter
+      )
     end,
-  },
-  {
-    "BufWinLeave",
-    pattern = "*.go",
-    callback = function()
-      ol.listchars = vim.opt_global.listchars:get()
-    end,
-  },
-  {
-    "WinEnter",
-    pattern = "*.go",
-    callback = function()
-      ol.colorcolumn = {}
-    end,
-  },
+  }
 })
+
+return {
+  augroup = augroup,
+}

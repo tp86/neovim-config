@@ -1,8 +1,10 @@
 local opt = vim.opt_local
 opt.expandtab = false
+opt.colorcolumn = {}
+opt.listchars.tab = "  "
 
-local register_autocmds_group = require("common").register_autocmds_group
-register_autocmds_group("GoFmt", {
+local augroup = require("auto").augroup
+augroup("GoFmt", {
   {
     "BufWritePre",
     pattern = "*.go",

@@ -13,6 +13,7 @@ local plugins_submodules = {
   "misc",
 }
 -- extra plugins are environment-specific and their submodules may not exist
+-- TODO convert to plugins from "extra" directory
 local extra_plugins_submodules = {
   "extra",
 }

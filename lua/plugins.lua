@@ -1,4 +1,5 @@
-local common = require("common")
-common.with_dependencies({ "git" }, function()
+local with_dependencies = require("utils.deps").with_dependencies
+local log = require("utils.log")
+with_dependencies({ "git" }, function()
   require("plugins.plug", true)
-end, common.warn("cannot install plugins due to: git not available"))
+end, log.warn("cannot install plugins due to: git not available"))

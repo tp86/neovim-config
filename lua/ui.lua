@@ -4,8 +4,8 @@ local function execute_if_command_exists(command)
   end
 end
 
-local register_autocmds_group = require("common").register_autocmds_group
-register_autocmds_group("GuiConfig", {
+local augroup = require("auto").augroup
+augroup("GuiConfig", {
   {
     "UIEnter",
     callback = function()

@@ -1,3 +1,7 @@
+local augroup = require("auto").augroup
+local with_dependencies = require("utils.deps").with_dependencies
+local log = require("utils.log")
+
 local plugins = {
   {
     "klen/nvim-config-local",
@@ -7,8 +11,7 @@ local plugins = {
         silent = true,
         lookup_parents = true,
       }
-      local common = require("common")
-      common.register_autocmds_group("ConfigLocalReload", {
+      augroup("ConfigLocalReload", {
         {
           "User",
           pattern = "ConfigLocalFinished",
@@ -26,7 +29,7 @@ local plugins = {
         event = event,
       }[1]
       if not autocmd then
-        common.warn("DirChanged for config-local does not exist")
+        log.warn("DirChanged for config-local does not exist")
         return
       end
       vim.api.nvim_del_autocmd(autocmd.id)
@@ -42,8 +45,7 @@ local plugins = {
   },
 }
 
-local common = require("common")
-common.with_dependencies({ "python3" }, function()
+with_dependencies({ "python3" }, function()
   table.insert(plugins, {
     "jmcantrell/vim-virtualenv",
     ["for"] = "python",
@@ -52,6 +54,6 @@ common.with_dependencies({ "python3" }, function()
       vim.g.virtualenv_directory = os.getenv("HOME") .. "/.venv"
     end,
   })
-end, common.warn("vim-virtualenv is not installed due to: python3 is not available"))
+end, log.warn("vim-virtualenv is not installed due to: python3 is not available"))
 
 return plugins

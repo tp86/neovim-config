@@ -7,6 +7,7 @@ return {
     build = function()
       local fonts_dir = vim.fn.expand("~/.local/share/fonts")
       local zip_file = fonts_dir .. "/Hack.zip"
+      -- chain of shell commands to spawn (inverted)
       local function nop() end
       local function update_cache(code)
         if code ~= 0 then return end
@@ -23,4 +24,5 @@ return {
       }, unzip)
     end,
   },
+  ["plenary"] = { "nvim-lua/plenary.nvim" },
 }

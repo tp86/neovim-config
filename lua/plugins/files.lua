@@ -40,7 +40,7 @@ return {
           }
         },
       }
-      local nmap = require("common").map.n
+      local nmap = require("mappings").map.n
       nmap([[<a-\>]], function() vim.cmd("NvimTreeOpen") end, "Open directory tree")
     end,
   },

@@ -1,7 +1,11 @@
+local map = require("mappings").map
+local augroup = require("auto").augroup
+
 local ok, wk = pcall(require, "which-key")
 if ok then
   wk.register { ["<localleader>g"] = { name = "+Git" } }
 end
+
 return {
   {
     "lewis6991/gitsigns.nvim",
@@ -15,16 +19,14 @@ return {
           },
         },
         on_attach = function(bufnr)
-          local common = require("common")
-          common.map.n("<localleader>gh", gitsigns.preview_hunk, "Preview git hunk")
-          common.map.n("<localleader>gb", gitsigns.blame_line, "Blame line")
-          common.map.n("]h", gitsigns.next_hunk, "Go to next git hunk")
-          common.map.n("[h", gitsigns.prev_hunk, "Go to previous git hunk")
+          map.n("<localleader>gh", gitsigns.preview_hunk, "Preview git hunk")
+          map.n("<localleader>gb", gitsigns.blame_line, "Blame line")
+          map.n("]h", gitsigns.next_hunk, "Go to next git hunk")
+          map.n("[h", gitsigns.prev_hunk, "Go to previous git hunk")
         end,
         current_line_blame = false,
         current_line_blame_formatter = " <author>, <author_time:%Y-%m-%d> - <summary>"
       }
-      local register_autocmds_group = require("common").register_autocmds_group
       local function colorssetup()
         local function inttocolorstring(n)
           return "#" .. string.format("%06x", n)
@@ -37,7 +39,7 @@ return {
         vim.api.nvim_set_hl(0, current_line_blame_hl_name, opts)
       end
       colorssetup()
-      register_autocmds_group("GitSignsCurrentLineBlameCustomize", {
+      augroup("GitSignsCurrentLineBlameCustomize", {
         {
           "ColorScheme",
           callback = colorssetup,
@@ -46,7 +48,7 @@ return {
     end,
   },
   -- dependency for diffview and neogit
-  { "nvim-lua/plenary.nvim" },
+  require("plugins.common")["plenary"],
   {
     "sindrets/diffview.nvim",
     config = function()
@@ -62,7 +64,6 @@ return {
   },
   {
     "NeogitOrg/neogit",
-    tag = vim.fn.has("nvim-0.10") == 0 and 'v0.0.1' or nil,
     config = function()
       local opts = {
         disable_commit_confirmation = true,
@@ -82,8 +83,7 @@ return {
       end
       local neogit = require("neogit")
       neogit.setup(opts)
-      local common = require("common")
-      common.map.n("<localleader>gg", neogit.open, "Open Neogit window")
+      map.n("<localleader>gg", neogit.open, "Open Neogit window")
       local function on_highlight()
         -- make highlighting more consistent
         vim.api.nvim_set_hl(0, "NeogitHunkHeader", { link = "NeogitHunkHeaderHighlight" })
@@ -99,7 +99,7 @@ return {
         vim.api.nvim_set_hl(0, "NeogitDiffHeaderCursor", { link = "NeogitDiffHeader" })
       end
       on_highlight()
-      common.register_autocmds_group("NeogitColorscheme", {
+      augroup("NeogitColorscheme", {
         {
           "ColorScheme",
           callback = on_highlight,

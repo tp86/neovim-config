@@ -1,8 +1,6 @@
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
---vim.cmd [[ syntax on ]]
-
 -- setup python provider before any plugins
 local pynvim_directory = vim.fn.stdpath("config") .. "/pynvim"
 if not vim.loop.fs_stat(pynvim_directory) then

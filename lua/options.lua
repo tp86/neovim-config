@@ -1,6 +1,6 @@
 local o = vim.opt
-local tabs = 2
 
+local tabs = 2
 o.expandtab = true
 o.tabstop = tabs
 o.softtabstop = tabs
@@ -37,17 +37,30 @@ o.splitright = true
 
 o.showmode = false
 
-local common = require("common")
-common.with_dependencies({ "rg" }, function()
+local with_dependencies = require("utils.deps").with_dependencies
+local log = require("utils.log")
+with_dependencies({ "rg" }, function()
   o.grepprg = "rg --line-number --column --with-filename"
   o.grepformat = "%f:%l:%c:%m"
-end, common.warn "ripgrep not installed, falling back to grep")
+end, log.warn "ripgrep not installed, falling back to grep")
 
 o.clipboard:append("unnamedplus")
 
 o.laststatus = 3
 
-local dynamic_options = require("dynamic_options")
+vim.diagnostic.config {
+  virtual_text = false,
+}
+o.updatetime = 1000
+
+local dynamic_options = {
+  colorcolumn = { 80 },
+  hlsearch = false,
+}
 for name, value in pairs(dynamic_options) do
   o[name] = value
 end
+
+return {
+  dynamic = dynamic_options,
+}

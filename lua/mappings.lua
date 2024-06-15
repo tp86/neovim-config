@@ -1,4 +1,26 @@
-local map = require("common").map
+local map_opts = { noremap = true }
+local function make_map(mode)
+  return function(keys, action, desc, opts)
+    opts = opts or {}
+    opts.desc = desc
+    opts = vim.tbl_extend("force", map_opts, opts)
+    vim.keymap.set(mode, keys, action, opts)
+  end
+end
+
+local nmap = make_map("n")
+local imap = make_map("i")
+local vmap = make_map("x")
+local tmap = make_map("t")
+local cmap = make_map("c")
+
+local map = setmetatable({
+  n = nmap,
+  i = imap,
+  v = vmap,
+  t = tmap,
+  c = cmap,
+}, { __call = function(_, ...) make_map({"n", "x", "o"})(...) end })
 
 -- probably to be removed
 map.n("<a-h>", "<c-w>h", "Go to the left window")
@@ -35,7 +57,6 @@ map.n("j", "gj", "Go to the next display line")
 map.n("k", "gk", "Go to the previous display line")
 
 local expr_opts = { expr = true }
-
 local function cwildmap(key, alt, desc)
   local wild_menu = vim.fn.wildmenumode
   map.c(key, function()
@@ -103,12 +124,10 @@ end
 map.i("<a-v>", insert_mode_put, "Paste in insert mode", expr_opts)
 map.i("<a-d>", "<c-o>D", "Delete until end of line in insert mode")
 
-map.n("<backspace>", "<c-6>", "Edit the alternate file")
+map.n("<tab>", "<c-6>", "Edit the alternate file")
 
-if vim.fn.has("nvim-0.10") == 0 then
-  map.n("]d", vim.diagnostic.goto_next, "Go to next diagnostic")
-  map.n("[d", vim.diagnostic.goto_prev, "Go to previous diagnostic")
-end
+map.n("]d", vim.diagnostic.goto_next, "Go to next diagnostic")
+map.n("[d", vim.diagnostic.goto_prev, "Go to previous diagnostic")
 
 map.n("<leader>d", vim.diagnostic.setqflist, "List diagnostic in QuickFix window")
 
@@ -117,3 +136,7 @@ map.n("]c", ":cnext<cr>", "Go to next quickfix")
 
 map.v("J", ":move '>+1<cr>gv=gv", "Move selected lines down")
 map.v("K", ":move '<-2<cr>gv=gv", "Move selected lines up")
+
+return {
+  map = map,
+}

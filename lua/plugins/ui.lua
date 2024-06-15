@@ -207,9 +207,9 @@ return {
           signcolumn = false,
         }
       }
-      local common = require("common")
+      local augroup = require("auto").augroup
       local ignoredfiletypes = { "NvimTree" }
-      common.register_autocmds_group("FocusDisable", {
+      augroup("FocusDisable", {
         {
           "FileType",
           callback = function()

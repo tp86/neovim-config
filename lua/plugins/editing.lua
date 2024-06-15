@@ -1,4 +1,4 @@
-local plugins = {
+return {
   {
     "windwp/nvim-autopairs",
     config = function()
@@ -20,23 +20,3 @@ local plugins = {
   },
   { "gpanders/nvim-parinfer" },
 }
-if vim.fn.has("nvim-0.10") == 0 then
-  table.insert(plugins,
-    {
-      "terrortylor/nvim-comment",
-      config = function()
-        local keys = "i/"
-        require("nvim_comment").setup {
-          comment_chunk_text_object = keys,
-        }
-        local ok, wk = pcall(require, "which-key")
-        if ok then
-          wk.register({
-            [keys] = "comment",
-          }, { mode = "o" })
-        end
-      end,
-    }
-  )
-end
-return plugins

@@ -26,10 +26,10 @@ return {
     "mtikekar/nvim-send-to-term",
     config = function()
       vim.g.send_disable_mapping = true
-      local common = require("common")
-      common.map.n("xx", "<Plug>SendLine", "Send current line to terminal")
-      common.map.n("x", "<Plug>Send", "Send to terminal")
-      common.map.v("x", "<Plug>Send", "Send to terminal")
+      local map = require("mappings").map
+      map.n("xx", "<Plug>SendLine", "Send current line to terminal")
+      map.n("x", "<Plug>Send", "Send to terminal")
+      map.v("x", "<Plug>Send", "Send to terminal")
       local ok, wk = pcall(require, "which-key")
       if ok then
         wk.register { x = { name = "+Send to terminal" } }
