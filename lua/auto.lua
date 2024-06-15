@@ -186,6 +186,30 @@ augroup("ForceInlayHintsRefresh", {
   }
 })
 
+-- augroup("FiletypeAutomation", {
+--   {
+--     "FileType",
+--     callback = function(args)
+--       local filetype = args.match
+--       require("auto." .. filetype)
+--     end,
+--   }
+-- })
+
+local function ftgroup(filetype)
+  return function(group, autocmds)
+    for _, autocmd in ipairs(autocmds) do
+      if vim.list_contains(autocmd, "FileType") then
+        autocmd.pattern = filetype
+      else
+        autocmd.pattern = "*." .. filetype
+      end
+    end
+    augroup(group, autocmds)
+  end
+end
+
 return {
   augroup = augroup,
+  ftgroup = ftgroup,
 }
