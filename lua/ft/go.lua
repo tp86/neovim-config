@@ -1,5 +1,5 @@
 local opt = vim.opt_local
-local augroup = require("auto").ftgroup("go")
+local augroup = require("ft").ftgroup("go")
 
 augroup("GoFiletype", {
   {
