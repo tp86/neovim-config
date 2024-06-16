@@ -3,6 +3,7 @@ local log = require("utils.log")
 local nmap = require("mappings").map.n
 local augroup = require("auto").augroup
 
+-- show signature help automatically
 -- inspired by: https://neovim.discourse.group/t/show-signature-help-on-insert-mode/2007/5
 local function handler(original_handler)
   local win_opened = false

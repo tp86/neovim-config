@@ -2,8 +2,8 @@
 
 local plugins_submodules = {
   "colors",
-  "ui",
   "nvim-extensions",
+  "ui",
   "editing",
   "terminal",
   "files",

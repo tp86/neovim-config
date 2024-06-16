@@ -1,3 +1,4 @@
+local map = require("mappings").map
 local jobsend = vim.fn.jobsend
 
 local function lua_send(eol_char)
@@ -26,7 +27,6 @@ return {
     "mtikekar/nvim-send-to-term",
     config = function()
       vim.g.send_disable_mapping = true
-      local map = require("mappings").map
       map.n("xx", "<Plug>SendLine", "Send current line to terminal")
       map.n("x", "<Plug>Send", "Send to terminal")
       map.v("x", "<Plug>Send", "Send to terminal")

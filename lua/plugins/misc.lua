@@ -22,12 +22,12 @@ local plugins = {
         }
       })
       -- fix for DirChanged autocmd to trigger nested autocmds
-      local event = "DirChanged"
       local group_name = "config-local"
-      local autocmd = vim.api.nvim_get_autocmds{
+      local event = "DirChanged"
+      local autocmd = (vim.api.nvim_get_autocmds{
         group = group_name,
         event = event,
-      }[1]
+      } or {})[1]
       if not autocmd then
         log.warn("DirChanged for config-local does not exist")
         return

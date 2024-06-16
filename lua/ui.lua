@@ -37,6 +37,7 @@ local function set_background()
   if hour < 8 or hour >= 19 then
     background = "dark"
   end
+  ---@diagnostic disable-next-line:undefined-field
   if vim.opt.background:get() ~= background then
     vim.opt.background = background
   end

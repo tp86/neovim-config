@@ -1,6 +1,7 @@
 local with_dependencies = require("utils.deps").with_dependencies
 local log = require("utils.log")
 local map = require("mappings").map
+local nmap = map.n
 
 local plugins = {
   {
@@ -150,7 +151,6 @@ local plugins = {
         linehl = '',
         numhl = '',
       })
-      local nmap = require("mappings").map.n
       local dap = require("dap")
       nmap("<a-7>", dap.continue, "Debug: continue")
       nmap("<a-8>", dap.step_over, "Debug: step over")

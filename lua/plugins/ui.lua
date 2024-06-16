@@ -1,3 +1,4 @@
+local augroup = require("auto").augroup
 -- helper functions for custom components
 --
 -- function combinators
@@ -207,7 +208,6 @@ return {
           signcolumn = false,
         }
       }
-      local augroup = require("auto").augroup
       local ignoredfiletypes = { "NvimTree" }
       augroup("FocusDisable", {
         {
