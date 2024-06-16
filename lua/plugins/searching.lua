@@ -4,27 +4,39 @@ local log = require("utils.log")
 
 local plugins = {
   {
-  "folke/flash.nvim",
-  config = function()
-    local flash = require("flash")
-    flash.setup {
-      highlight = {
-        backdrop = false,
-      },
-      modes = {
-        char = {
-          highlight = {
-            backdrop = false
-          }
+    "folke/flash.nvim",
+    config = function()
+      local flash = require("flash")
+      flash.setup {
+        highlight = {
+          backdrop = false,
         },
-        search = {
-          enabled = false,
+        modes = {
+          char = {
+            highlight = {
+              backdrop = false
+            }
+          },
+          search = {
+            enabled = false,
+          },
         },
-      },
-    }
-    map.n("sj", flash.jump, "Flash jump")
-  end,
-},
+      }
+      map.n("sj", flash.jump, "Flash jump")
+    end,
+  },
+  {
+    "VoxelPrismatic/rabbit.nvim",
+    config = function()
+      require("rabbit").setup{
+        default_keys = {
+          open = {
+            "<leader>h",
+          },
+        },
+      }
+    end,
+  },
 }
 
 with_dependencies({ "make", "gcc" }, function()
