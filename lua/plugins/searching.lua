@@ -30,10 +30,10 @@ common.with_dependencies({ "make", "gcc" }, function()
       common.map.n("sg", builtin.git_branches, "Find git branches")
       common.map.n("sr", function() builtin.lsp_references{ fname_width = 50, trim_text = true } end, "Find references")
 
-      local ok, wk = pcall(require, "which-key")
-      if ok then
-        wk.register { s = { name = "+Live search" } }
-      end
+      -- local ok, wk = pcall(require, "which-key")
+      -- if ok then
+      --   wk.register { s = { name = "+Live search" } }
+      -- end
 
       telescope.load_extension("fzf")
     end

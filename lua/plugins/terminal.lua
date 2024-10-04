@@ -30,10 +30,10 @@ return {
       common.map.n("xx", "<Plug>SendLine", "Send current line to terminal")
       common.map.n("x", "<Plug>Send", "Send to terminal")
       common.map.v("x", "<Plug>Send", "Send to terminal")
-      local ok, wk = pcall(require, "which-key")
-      if ok then
-        wk.register { x = { name = "+Send to terminal" } }
-      end
+      -- local ok, wk = pcall(require, "which-key")
+      -- if ok then
+      --   wk.register { x = { name = "+Send to terminal" } }
+      -- end
       vim.g.send_multiline = {
         lua = { send = lua_send() },
       }

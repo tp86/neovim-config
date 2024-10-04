@@ -29,12 +29,12 @@ if vim.fn.has("nvim-0.10") == 0 then
         require("nvim_comment").setup {
           comment_chunk_text_object = keys,
         }
-        local ok, wk = pcall(require, "which-key")
-        if ok then
-          wk.register({
-            [keys] = "comment",
-          }, { mode = "o" })
-        end
+        -- local ok, wk = pcall(require, "which-key")
+        -- if ok then
+        --   wk.register({
+        --     [keys] = "comment",
+        --   }, { mode = "o" })
+        -- end
       end,
     }
   )

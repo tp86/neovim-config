@@ -21,7 +21,7 @@ local plugins = {
         config.capabilities = common.lsp.capabilities
         lspconfig[server].setup(config)
       end
-      local gopls_default_config = require("lspconfig.server_configurations.gopls")
+      local gopls_default_config = require("lspconfig").gopls.config_def
       gopls_default_config.default_config.settings = {
         gopls = {
           hints = {
@@ -222,7 +222,8 @@ local plugins = {
         max_filename_len = math.min(max_filename_len, 60)
         local formatted = {}
         for _, l in ipairs(list) do
-          table.insert(formatted, ("%-"..max_filename_len.."s|%"..max_loc_len.."s| %s"):format(l.filename, loc(l.lnum, l.col), l.text))
+          table.insert(formatted,
+            ("%-" .. max_filename_len .. "s|%" .. max_loc_len .. "s| %s"):format(l.filename, loc(l.lnum, l.col), l.text))
         end
         vim.fn.append(0, formatted)
       end
@@ -279,21 +280,22 @@ common.with_dependencies({ "gcc" }, function()
           },
         },
       }
-      local ok, wk = pcall(require, "which-key")
-      if ok then
-        wk.register({
-          ["af"] = "function",
-          ["if"] = "function",
-          ["aa"] = "parameter",
-          ["ia"] = "parameter",
-          ["ac"] = "call",
-          ["ic"] = "call",
-          ["ao"] = "class",
-          ["io"] = "class",
-          ["al"] = "loop",
-          ["il"] = "loop",
-        }, { mode = "o" })
-      end
+      -- local ok, wk = pcall(require, "which-key")
+      -- if ok then
+      --   wk.register({
+      --     mode = {"o"},
+      --     { "", desc = "function" },
+      --     { "if", desc = "function" },
+      --     { "aa", desc = "parameter" },
+      --     { "ia", desc = "parameter" },
+      --     { "ac", desc = "call" },
+      --     { "ic", desc = "call" },
+      --     { "ao", desc = "class" },
+      --     { "io", desc = "class" },
+      --     { "al", desc = "loop" },
+      --     { "il", desc = "loop" },
+      --   })
+      -- end
       vim.opt.foldmethod = "expr"
       vim.opt.foldexpr = "nvim-treesitter#foldexpr()"
       vim.opt.foldenable = false

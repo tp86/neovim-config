@@ -1,19 +1,19 @@
-local ok, wk = pcall(require, "which-key")
-if ok then
-  wk.register { ["<localleader>g"] = { name = "+Git" } }
-end
+-- local ok, wk = pcall(require, "which-key")
+-- if ok then
+--   wk.register { ["<localleader>g"] = { name = "+Git" } }
+-- end
 return {
   {
     "lewis6991/gitsigns.nvim",
     config = function()
       local gitsigns = require("gitsigns")
       gitsigns.setup {
-        signs = {
-          changedelete = {
-            hl = "GitSignsDelete",
-            text = "┃",
-          },
-        },
+        -- signs = {
+        --   changedelete = {
+        --     hl = "GitSignsDelete",
+        --     text = "┃",
+        --   },
+        -- },
         on_attach = function(bufnr)
           local common = require("common")
           common.map.n("<localleader>gh", gitsigns.preview_hunk, "Preview git hunk")
@@ -35,6 +35,7 @@ return {
           fg = inttocolorstring(vim.api.nvim_get_hl(0, { name = "NonText" }).fg)
         }
         vim.api.nvim_set_hl(0, current_line_blame_hl_name, opts)
+        vim.api.nvim_set_hl(0, "GitSignsChangedelete", { link = 'GitSignsDelete' })
       end
       colorssetup()
       register_autocmds_group("GitSignsCurrentLineBlameCustomize", {
